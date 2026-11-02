@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const user = session.user;
 
-        // 2. Fetch Organizer Profile Data
+        // VULN-013 FIX: Never select secret_key or unnecessary PII to client
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, full_name, role, institution, area_city, phone_number')
             .eq('id', user.id)
             .single();
 
@@ -130,7 +130,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         dashboardContent.style.display = 'block';
 
     } catch (error) {
-        console.error("Error loading dashboard:", error.message);
-        loadingState.textContent = "Error loading dashboard: " + error.message;
+        // VULN-011 FIX: Never expose raw DB error messages to users
+        const safeMessages = {
+            'PGRST116': 'Profile not found. Please contact support.',
+            'PGRST301': 'Session expired. Please log in again.',
+            '42501':    'Access denied.',
+        };
+        const userMsg = safeMessages[error?.code] || 'Unable to load dashboard. Please refresh.';
+        loadingState.textContent = userMsg;
+        // Only log details in non-production environments
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            console.error('[DEBUG] Dashboard error:', error.message);
+        }
     }
 });

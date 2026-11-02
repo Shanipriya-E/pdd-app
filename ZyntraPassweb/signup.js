@@ -10,6 +10,33 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Supabase init error:", e);
     }
 
+    // ── Security helpers ────────────────────────────────────────────────────
+    // VULN-002 FIX: Strict role allowlist — URL param cannot grant elevated roles
+    const ALLOWED_SIGNUP_ROLES = ['attendee', 'organizer'];
+
+    // VULN-003 FIX: Input max-length validation
+    const MAX_LENGTHS = { fullName: 100, institution: 200, areaCity: 100, nativePlace: 100 };
+    function validateLength(value, field) {
+        const max = MAX_LENGTHS[field] || 500;
+        if (value.trim().length === 0) throw new Error(`${field} cannot be empty.`);
+        if (value.length > max) throw new Error(`${field} must be under ${max} characters.`);
+        return value.trim();
+    }
+
+    // VULN-018 FIX: Password strength enforcement
+    function validatePasswordStrength(password) {
+        const checks = {
+            'at least 8 characters':    password.length >= 8,
+            'an uppercase letter':       /[A-Z]/.test(password),
+            'a lowercase letter':        /[a-z]/.test(password),
+            'a number':                  /\d/.test(password),
+        };
+        const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([rule]) => rule);
+        if (failed.length > 0) {
+            throw new Error('Password must include: ' + failed.join(', ') + '.');
+        }
+    }
+
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -33,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const errorMsg = document.getElementById('error-msg');
             const submitBtn = document.getElementById('submit-btn');
 
+            // VULN-018: Enforce password strength before submission
+            try { validatePasswordStrength(password); } catch (strengthErr) {
+                errorMsg.textContent = strengthErr.message;
+                errorMsg.style.display = 'block';
+                return;
+            }
             if (password !== confirmPassword) {
                 errorMsg.textContent = "Passwords do not match!";
                 errorMsg.style.display = 'block';
@@ -44,9 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMsg.style.display = 'none';
 
             try {
-                // Get role from URL query param, default to attendee if not specified
+                // VULN-002 FIX: Validate role against strict allowlist — prevents privilege escalation
                 const urlParams = new URLSearchParams(window.location.search);
-                const selectedRole = urlParams.get('role') || 'attendee';
+                const rawRole = urlParams.get('role');
+                const selectedRole = ALLOWED_SIGNUP_ROLES.includes(rawRole) ? rawRole : 'attendee';
+                // Note: 'volunteer' role is NEVER self-assignable via signup
 
                 const { data: authData, error: authError } = await supabase.auth.signUp({
                     email: email,
@@ -58,16 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (authData && authData.user) {
                     const user = authData.user;
                     
+                    // VULN-003 FIX: Validate lengths before inserting to DB
                     const { error: profileError } = await supabase.from('profiles').insert([
                         { 
                             id: user.id, 
-                            role: selectedRole, 
-                            full_name: fullName,
+                            role: selectedRole,  // VULN-002: validated against allowlist above
+                            full_name: validateLength(fullName, 'fullName'),
                             phone_number: phone,
-                            institution: institution,
-                            area_city: areaCity,
-                            native_place: nativePlace,
-                            secret_key: secretKey
+                            institution: validateLength(institution, 'institution'),
+                            area_city: validateLength(areaCity, 'areaCity'),
+                            native_place: validateLength(nativePlace, 'nativePlace'),
+                            secret_key: secretKey  // Note: hashing recommended (VULN-010)
                         }
                     ]);
 

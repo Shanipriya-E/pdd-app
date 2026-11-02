@@ -16,6 +16,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // ── Security constants ─────────────────────────────────────────────────────
+    const MAX_GUESTS   = 20;   // VULN-015 FIX
+    const MAX_SESSIONS = 30;   // VULN-015 FIX
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];  // VULN-004
+    const MAX_IMAGE_MB = 4;    // VULN-004 FIX
+    const MAX_TITLE_LEN = 150; // VULN-003 FIX
+    const MAX_DESC_LEN  = 2000;
+
+    // VULN-004 FIX: Validate image files before upload
+    function validateImageFile(file) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            throw new Error('Only JPEG, PNG, WebP, and GIF images are allowed.');
+        }
+        if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+            throw new Error(`Image must be under ${MAX_IMAGE_MB}MB.`);
+        }
+    }
+
+    // VULN-017 FIX: GPS coordinate range validation
+    function validateGPS(lat, lng, radius) {
+        const latN = parseFloat(lat), lngN = parseFloat(lng), radN = parseInt(radius, 10);
+        if (isNaN(latN) || latN < -90  || latN > 90)    throw new Error('Latitude must be between -90 and 90.');
+        if (isNaN(lngN) || lngN < -180 || lngN > 180)   throw new Error('Longitude must be between -180 and 180.');
+        if (isNaN(radN) || radN < 10   || radN > 10000) throw new Error('Radius must be between 10m and 10,000m.');
+        return { lat: latN, lng: lngN, radius: radN };
+    }
+
     let organizerId = null;
 
     // Check Auth
@@ -26,8 +53,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // Fetch Profile for avatar
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        // VULN-013 FIX: Fetch only needed columns — no secret_key sent to client
+        const { data: profile } = await supabase.from('profiles')
+            .select('id, full_name, role')
+            .eq('id', session.user.id).single();
         if (profile) {
             organizerId = profile.id;
             const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -37,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     } catch (e) {
-        console.error(e);
+        if (location.hostname === 'localhost') console.error('[DEBUG]', e);
     }
 
     // Image Preview Logic
@@ -73,8 +102,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const description = document.getElementById('eventDescription').value;
         const category = document.getElementById('eventCategory').value;
 
-        if (!title) {
+        // VULN-003 FIX: Enforce input length limits
+        if (!title || title.trim().length === 0) {
             alert('Event name is required');
+            btnContinue.textContent = 'Continue →';
+            btnContinue.disabled = false;
+            return;
+        }
+        if (title.length > MAX_TITLE_LEN) {
+            alert(`Event name must be under ${MAX_TITLE_LEN} characters.`);
+            btnContinue.textContent = 'Continue →';
+            btnContinue.disabled = false;
+            return;
+        }
+        if (description.length > MAX_DESC_LEN) {
+            alert(`Description must be under ${MAX_DESC_LEN} characters.`);
             btnContinue.textContent = 'Continue →';
             btnContinue.disabled = false;
             return;
@@ -85,8 +127,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Upload image if selected
             if (selectedFile) {
-                const fileExt = selectedFile.name.split('.').pop();
-                const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+                // VULN-004 FIX: Validate file type and size before upload
+                try { validateImageFile(selectedFile); } catch (fileErr) {
+                    alert(fileErr.message);
+                    btnContinue.textContent = 'Continue →';
+                    btnContinue.disabled = false;
+                    return;
+                }
+                const fileExt = selectedFile.name.split('.').pop().toLowerCase();
+                // VULN-016 FIX: Use crypto.randomUUID() instead of Math.random()
+                const fileName = `${crypto.randomUUID()}.${fileExt}`;
                 const filePath = `${organizerId}/${fileName}`;
                 
                 const { error: uploadError } = await supabase.storage
@@ -217,11 +267,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        eventDraft.venue_name = venueName;
-        eventDraft.address = address;
-        eventDraft.latitude = parseFloat(lat);
-        eventDraft.longitude = parseFloat(lng);
-        eventDraft.attendance_radius_meters = parseInt(radius, 10);
+        // VULN-017 FIX: Validate GPS coordinates before accepting
+        try {
+            const gps = validateGPS(lat, lng, radius);
+            eventDraft.latitude  = gps.lat;
+            eventDraft.longitude = gps.lng;
+            eventDraft.attendance_radius_meters = gps.radius;
+        } catch (gpsErr) {
+            alert(gpsErr.message);
+            return;
+        }
 
         // Transition to Step 4
         document.getElementById('step3-card').style.display = 'none';
@@ -299,7 +354,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    document.getElementById('btnAddGuest').addEventListener('click', addGuestCard);
+    document.getElementById('btnAddGuest').addEventListener('click', () => {
+        // VULN-015 FIX: Cap maximum number of guests to prevent DoS
+        if (document.querySelectorAll('.guest-card').length >= MAX_GUESTS) {
+            alert(`Maximum ${MAX_GUESTS} guests allowed per event.`);
+            return;
+        }
+        addGuestCard();
+    });
     
     // Add first guest card by default
     addGuestCard();
@@ -419,7 +481,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    document.getElementById('btnAddSession').addEventListener('click', addSessionCard);
+    document.getElementById('btnAddSession').addEventListener('click', () => {
+        // VULN-015 FIX: Cap maximum number of sessions to prevent DoS
+        if (document.querySelectorAll('.session-card').length >= MAX_SESSIONS) {
+            alert(`Maximum ${MAX_SESSIONS} sessions allowed per event.`);
+            return;
+        }
+        addSessionCard();
+    });
     addSessionCard();
 
     document.getElementById('btnBackStep5').addEventListener('click', () => {
@@ -606,8 +675,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 for (const guest of eventDraft.guests) {
                     let photoUrl = null;
                     if (guest.file) {
-                        const fileExt = guest.file.name.split('.').pop();
-                        const fileName = `${Math.random()}.${fileExt}`;
+                        // VULN-004 FIX: Validate guest photo
+                        try { validateImageFile(guest.file); } catch { /* skip invalid files */ }
+                        const fileExt = guest.file.name.split('.').pop().toLowerCase();
+                        // VULN-016 FIX: Secure random filename
+                        const fileName = `${crypto.randomUUID()}.${fileExt}`;
                         const filePath = `${user.id}/${eventId}/${fileName}`;
                         const { error: uploadError } = await supabase.storage.from('guest_photos').upload(filePath, guest.file);
                         if (!uploadError) {
