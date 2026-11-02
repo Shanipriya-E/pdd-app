@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_white_button"
+    android:padding="16dp"
+    android:layout_marginBottom="24dp">
+
+    <ImageView
+        android:id="@+id/ivEventImage"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="#F1F5F9"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+        
+        <TextView
+            android:id="@+id/tvStatusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="upcoming"
+            android:textColor="#3B35A8"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:background="@drawable/bg_role_button"
+            android:backgroundTint="#EEF2FF"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvCategoryBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category"
+            android:textColor="#475569"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:background="@drawable/bg_role_button"
+            android:backgroundTint="#F1F5F9"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvCheckpointsBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 checkpoints"
+            android:textColor="#475569"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:background="@drawable/bg_role_button"
+            android:backgroundTint="#F1F5F9"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvEventTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Untitled event"
+        android:textColor="#0F172A"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+</LinearLayout>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Event Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #f7f9fc; color: #0d162a; padding-bottom: 100px; }
+
+        /* Top Bar */
+        .top-bar { background: white; padding: 16px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .btn-back { background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #0d162a;}
+        .top-title { font-size: 18px; font-weight: 700; flex: 1; color: #0f172a; }
+
+        /* Banner */
+        .banner-container { width: 100%; height: 250px; background: #e2e8f0; }
+        .event-banner { width: 100%; height: 100%; object-fit: cover; }
+        .banner-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px; background: linear-gradient(135deg, #e0e7ff, #f1f5f9); color: #94a3b8; }
+
+        /* Container */
+        .container { max-width: 640px; margin: -30px auto 0 auto; padding: 0 20px; position: relative; z-index: 10; }
+
+        /* Main Card */
+        .main-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .event-tags { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .tag { background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; }
+        .event-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; line-height: 1.3; }
+        .event-org { font-size: 15px; color: #3b35a8; font-weight: 600; margin-bottom: 20px; }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
+        .info-item { display: flex; align-items: flex-start; gap: 12px; }
+        .info-icon { font-size: 20px; background: #f8fafc; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .info-text h4 { font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 2px; }
+        .info-text p { font-size: 15px; font-weight: 700; color: #0f172a; }
+
+        /* Description */
+        .section-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 16px; }
+        .description { font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 32px; white-space: pre-line; }
+
+        /* Guests & Sessions */
+        .list-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 16px; display: flex; gap: 16px; align-items: center; }
+        .guest-avatar { width: 56px; height: 56px; border-radius: 50%; background: #e0e7ff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #3b35a8; flex-shrink: 0; }
+        .list-info h4 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+        .list-info p { font-size: 14px; color: #64748b; }
+        
+        .session-time { font-size: 13px; font-weight: 700; color: #3b35a8; background: #e0e7ff; padding: 4px 10px; border-radius: 8px; margin-bottom: 8px; display: inline-block; }
+
+        /* Bottom Action Bar */
+        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: center; z-index: 100; }
+        .btn-register { width: 100%; max-width: 600px; background: #5b54e3; color: white; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-register:disabled { background: #e2e8f0; color: #64748b; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="javascript:history.back()" class="btn-back">←</a>
+    <div class="top-title">Event Details</div>
+</div>
+
+<div class="banner-container" id="bannerContainer">
+    <div class="banner-placeholder">🖼️</div>
+</div>
+
+<div class="container">
+    <div class="main-card">
+        <div class="event-tags" id="eventTags"></div>
+        <h1 class="event-title" id="eventTitle">Loading...</h1>
+        <p class="event-org" id="eventOrg">...</p>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-icon">📅</div>
+                <div class="info-text">
+                    <h4>Date</h4>
+                    <p id="eventDate">...</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🕒</div>
+                <div class="info-text">
+                    <h4>Time</h4>
+                    <p id="eventTime">...</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div class="info-text">
+                    <h4>Location</h4>
+                    <p id="eventLocation">...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">About this event</h2>
+    <div class="description" id="eventDescription">...</div>
+
+    <div id="guestsSection" style="display: none; margin-bottom: 32px;">
+        <h2 class="section-title">Special Guests</h2>
+        <div id="guestsList"></div>
+    </div>
+
+    <div id="sessionsSection" style="display: none; margin-bottom: 32px;">
+        <h2 class="section-title">Event Schedule</h2>
+        <div id="sessionsList"></div>
+    </div>
+</div>
+
+<div class="action-bar">
+    <button class="btn-register" id="btnRegister">Register Now</button>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+    let sb, currentUserId;
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('id');
+
+    async function main() {
+        if (!eventId) {
+            alert('No event ID provided.');
+            window.history.back();
+            return;
+        }
+
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        const { data: { session } } = await sb.auth.getSession();
+        
+        if (session) {
+            currentUserId = session.user.id;
+        }
+
+        await loadEventDetails();
+        
+        if (currentUserId) {
+            await checkRegistration();
+        } else {
+            document.getElementById('btnRegister').textContent = 'Sign in to Register';
+            document.getElementById('btnRegister').onclick = () => window.location.href = 'login.html';
+        }
+    }
+
+    async function loadEventDetails() {
+        // Fetch event
+        const { data: ev, error } = await sb.from('events').select('*').eq('id', eventId).single();
+        if (error || !ev) {
+            alert('Event not found.');
+            return;
+        }
+
+        // Fetch organizer
+        const { data: org } = await sb.from('profiles').select('full_name, institution').eq('id', ev.organizer_id).single();
+        const orgName = org ? (org.institution || org.full_name) : "Unknown Organizer";
+
+        // Update UI
+        document.getElementById('eventTitle').textContent = ev.title;
+        document.getElementById('eventOrg').textContent = 'By ' + orgName;
+        
+        let dateStr = ev.start_date || 'TBA';
+        if (ev.end_date && ev.end_date !== ev.start_date) dateStr += ' to ' + ev.end_date;
+        document.getElementById('eventDate').textContent = dateStr;
+        
+        let timeStr = ev.start_time || 'TBA';
+        if (ev.end_time) timeStr += ' - ' + ev.end_time;
+        document.getElementById('eventTime').textContent = timeStr;
+        
+        document.getElementById('eventLocation').textContent = ev.venue_name || 'Online';
+        document.getElementById('eventDescription').textContent = ev.description || 'No description provided.';
+
+        // Banner
+                // Banner
+        if (ev.banner_image_url && ev.banner_image_url !== 'null') {
+            document.getElementById('bannerContainer').innerHTML = `<img src="${ev.banner_image_url}" class="event-banner" alt="Banner">`;
+        } else {
+            document.getElementById('bannerContainer').innerHTML = `<img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200" class="event-banner" alt="Banner">`;
+        }
+
+        // Tags
+        const tagsHtml = [];
+        if (ev.category) tagsHtml.push(`<span class="tag">${ev.category}</span>`);
+        tagsHtml.push(`<span class="tag">Free</span>`); // Placeholder
+        document.getElementById('eventTags').innerHTML = tagsHtml.join('');
+
+        // Fetch Guests
+        const { data: guests } = await sb.from('event_guests').select('*').eq('event_id', eventId);
+        if (guests && guests.length > 0) {
+            document.getElementById('guestsSection').style.display = 'block';
+            document.getElementById('guestsList').innerHTML = guests.map(g => `
+                <div class="list-card">
+                    <div class="guest-avatar">${g.name.charAt(0).toUpperCase()}</div>
+                    <div class="list-info">
+                        <h4>${g.name}</h4>
+                        <p>${g.role || ''} ${g.organisation ? '@ ' + g.organisation : ''}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fetch Sessions
+        const { data: sessions } = await sb.from('event_sessions').select('*').eq('event_id', eventId).order('start_time', { ascending: true });
+        if (sessions && sessions.length > 0) {
+            document.getElementById('sessionsSection').style.display = 'block';
+            document.getElementById('sessionsList').innerHTML = sessions.map(s => `
+                <div class="list-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <div class="session-time">🕒 ${s.start_time || 'TBA'} ${s.end_time ? '- ' + s.end_time : ''}</div>
+                    <div class="list-info">
+                        <h4>${s.name}</h4>
+                        ${s.speaker ? `<p>Speaker: ${s.speaker}</p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    async function checkRegistration() {
+        const btn = document.getElementById('btnRegister');
+        
+        const { data: reg } = await sb.from('event_registrations').select('status').eq('attendee_id', currentUserId).eq('event_id', eventId).maybeSingle();
+        
+        if (reg) {
+            btn.disabled = true;
+            btn.textContent = reg.status === 'approved' ? 'Approved & Registered' : 'Registration Pending';
+            if (reg.status === 'registered') {
+                btn.textContent = 'Registered';
+            }
+        } else {
+            btn.onclick = async () => {
+                btn.disabled = true;
+                btn.textContent = 'Registering...';
+                
+                const { error } = await sb.from('event_registrations').insert([
+                    { event_id: eventId, attendee_id: currentUserId, status: 'registered' }
+                ]);
+                
+                if (error) {
+                    alert('Registration failed: ' + error.message);
+                    btn.disabled = false;
+                    btn.textContent = 'Register Now';
+                } else {
+                    btn.textContent = 'Registered';
+                }
+            };
+        }
+    }
+
+    main();
+</script>
+</body>
+</html>

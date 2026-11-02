@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Volunteer Scan</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+
+        .container { padding: 24px 16px; max-width: 480px; margin: 0 auto; text-align: center; }
+        .page-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .page-subtitle { font-size: 14px; color: #475569; margin-bottom: 24px; line-height: 1.5; }
+
+        #reader {
+            width: 100%; max-width: 400px; margin: 0 auto 24px auto;
+            border-radius: 20px; overflow: hidden; border: 2px solid #5b54e3;
+            box-shadow: 0 10px 25px rgba(91, 84, 227, 0.2);
+        }
+
+        .status-box {
+            padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px;
+            display: none; margin-top: 16px;
+        }
+        .status-success { background: #d1fae5; color: #047857; border: 1px solid #34d399; }
+        .status-error { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; }
+
+        .btn-action {
+            display: inline-block; background: #5b54e3; color: white;
+            padding: 12px 24px; border-radius: 12px; font-weight: bold; cursor: pointer;
+            border: none; margin-top: 12px;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            text-decoration: none; color: #64748b; font-size: 11px; font-weight: 600; gap: 4px;
+        }
+        .nav-item.active { color: #5b54e3; }
+        .nav-icon { font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn" onclick="window.history.back()">←</button>
+    <button class="btn-logout" onclick="volunteerLogout()" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 14px; padding: 8px;">Logout 🚪</button>
+</div>
+
+<div class="container">
+    <h1 class="page-title">Scan Attendee QR</h1>
+    <p class="page-subtitle">Scan an attendee's dynamic QR code to mark them as attended.</p>
+
+    <div id="reader"></div>
+
+    <div id="statusBox" class="status-box"></div>
+    
+    <button class="btn-action" id="restartBtn" style="display:none;" onclick="startScanner()">Scan Another</button>
+</div>
+
+<div class="bottom-nav">
+    <a href="volunteer_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+    <a href="volunteer_scan.html" class="nav-item active"><span class="nav-icon">🔲</span><span>Scan</span></a>
+    <a href="volunteer_participants.html" class="nav-item"><span class="nav-icon">👥</span><span>Participants</span></a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let html5QrcodeScanner;
+    let isProcessing = false;
+
+    async function init() {
+        const vCode = localStorage.getItem('volunteer_code');
+        const vEventId = localStorage.getItem('volunteer_event_id');
+        
+        if (!vCode || !vEventId) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        startScanner();
+    }
+
+    function startScanner() {
+        isProcessing = false;
+        document.getElementById('statusBox').style.display = 'none';
+        document.getElementById('restartBtn').style.display = 'none';
+
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: {width: 250, height: 250} },
+            /* verbose= */ false
+        );
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    }
+
+    async function onScanSuccess(decodedText, decodedResult) {
+        if (isProcessing) return;
+        isProcessing = true;
+        html5QrcodeScanner.clear(); // Stop scanning
+
+        try {
+            const payload = JSON.parse(decodedText);
+            
+            if (!payload.event_id || !payload.attendee_id || !payload.timestamp) {
+                throw new Error("Invalid QR format");
+            }
+            
+            const vEventId = localStorage.getItem('volunteer_event_id');
+            if (payload.event_id !== vEventId) {
+                throw new Error("This QR belongs to a different event!");
+            }
+
+            // QR Expiry Check (Optional but good for dynamic QR)
+            const now = Date.now();
+            if (now - payload.timestamp > 120000) { // 2 minutes max
+                throw new Error("QR Code Expired. Ask attendee to show a fresh QR.");
+            }
+
+            // Verify with Supabase RPC
+            const vCode = localStorage.getItem('volunteer_code');
+            const { data, error } = await sb.rpc('volunteer_scan_qr', {
+                v_code: vCode,
+                e_id: payload.event_id,
+                a_id: payload.attendee_id
+            });
+
+            if (error) throw error;
+
+            showStatus("✓ Attendee Successfully Verified!", true);
+
+        } catch (err) {
+            console.error(err);
+            showStatus("✕ Error: " + err.message, false);
+        }
+    }
+
+    function onScanFailure(error) {
+        // Ignore constant scan failures when no QR is in frame
+    }
+
+    function showStatus(msg, isSuccess) {
+        const box = document.getElementById('statusBox');
+        box.textContent = msg;
+        box.className = 'status-box ' + (isSuccess ? 'status-success' : 'status-error');
+        box.style.display = 'block';
+        document.getElementById('restartBtn').style.display = 'inline-block';
+    }
+
+    function volunteerLogout() {
+        localStorage.removeItem('volunteer_code');
+        localStorage.removeItem('volunteer_user_id');
+        localStorage.removeItem('volunteer_event_id');
+        localStorage.removeItem('volunteer_id');
+        window.location.href = 'index.html';
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>

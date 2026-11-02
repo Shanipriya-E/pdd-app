@@ -1,0 +1,10 @@
+import psycopg2
+conn = psycopg2.connect('postgresql://postgres:Harsha%4020042006@db.qokgtrabcxtxlympbkyb.supabase.co:5432/postgres')
+cur = conn.cursor()
+cur.execute("SELECT id, organizer_id FROM events")
+events = cur.fetchall()
+print("Events:", events)
+cur.execute("SELECT id, event_id, user_id, status FROM volunteers")
+vols = cur.fetchall()
+print("Volunteers:", vols)
+conn.close()

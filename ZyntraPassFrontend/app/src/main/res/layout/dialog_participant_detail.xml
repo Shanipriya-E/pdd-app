@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:id="@+id/dpAvatar"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_primary_button"
+            android:backgroundTint="#E0E7FF"
+            android:text="U"
+            android:textColor="#5B54E3"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dpName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unknown User"
+                android:textColor="#0F172A"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/dpEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="no email"
+                android:textColor="#64748B"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INSTITUTION / COMPANY"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#94A3B8"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:id="@+id/dpInstitution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textColor="#0F172A"
+        android:textSize="15sp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AREA / CITY"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#94A3B8"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:id="@+id/dpArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textColor="#0F172A"
+        android:textSize="15sp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ROLE"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#94A3B8"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:id="@+id/dpRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textColor="#0F172A"
+        android:textSize="15sp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CURRENT STATUS"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#94A3B8"
+        android:layout_marginBottom="4dp"/>
+    <TextView
+        android:id="@+id/dpStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:textColor="#0F172A"
+        android:textSize="15sp"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/dpBtnAccept"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
+            android:text="Accept"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:backgroundTint="#16A34A"
+            android:layout_marginEnd="12dp"
+            app:cornerRadius="12dp"/>
+
+        <Button
+            android:id="@+id/dpBtnReject"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
+            android:text="Reject"
+            android:textAllCaps="false"
+            android:textColor="#DC2626"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:backgroundTint="#FEE2E2" 
+            app:cornerRadius="12dp"/>
+    </LinearLayout>
+
+</LinearLayout>

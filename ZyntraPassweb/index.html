@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="brand-name">ZyntraPass</span>
+            </div>
+            <div class="header-actions">
+                <button id="sign-in-btn" class="btn btn-secondary btn-signin">Sign in</button>
+                <button id="create-account-btn" class="btn btn-white">Create account</button>
+            </div>
+        </header>
+
+        <main>
+            <h1 class="hero-title">One Platform.<br>Every Event. Every<br>Certificate.</h1>
+            <p class="hero-subtitle">
+                Discover events, register instantly, track attendance, connect with people who share your interests, and keep every certificate in one place.
+            </p>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary">Explore Events</button>
+                <button class="btn btn-secondary">Organize an Event</button>
+            </div>
+        </main>
+
+        <footer>
+            <div class="stats">
+                <div class="stat-item">
+                    <h2>1,842</h2>
+                    <p>Events hosted</p>
+                </div>
+                <div class="stat-item">
+                    <h2>96.4%</h2>
+                    <p>Verified<br>attendance</p>
+                </div>
+                <div class="stat-item">
+                    <h2>74k</h2>
+                    <p>Certificates<br>issued</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Role Selection Modal -->
+    <div class="modal-overlay" id="role-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Choose Account Type</h2>
+            <p class="modal-subtitle">How do you want to use ZyntraPass?</p>
+            
+            <button class="role-btn" data-role="attendee">I am an Attendee</button>
+            <button class="role-btn" data-role="organizer">I am an Organizer</button>
+            
+            <button class="close-modal" id="close-modal-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Volunteer Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+
+        .container { padding: 24px 16px; max-width: 480px; margin: 0 auto; }
+        .greeting { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .sub-greeting { font-size: 14px; color: #475569; margin-bottom: 24px; line-height: 1.5; }
+
+        .event-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-radius: 20px; padding: 24px; color: white;
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+        }
+        
+        .card-badge {
+            display: inline-block; background: rgba(255,255,255,0.15);
+            padding: 6px 12px; border-radius: 16px; font-size: 12px;
+            font-weight: 600; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .event-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+        
+        .event-meta { font-size: 13px; color: #bfdbfe; margin-bottom: 8px; }
+        .event-details { font-size: 12px; color: #93c5fd; margin-bottom: 24px; line-height: 1.4; }
+
+        .btn-primary, .btn-secondary {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 14px; border-radius: 12px; font-weight: 700;
+            font-size: 15px; cursor: pointer; border: none; margin-bottom: 12px; gap: 8px;
+        }
+        .btn-primary { background: white; color: #0f172a; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; border-top: 1px solid #e2e8f0;
+            display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            text-decoration: none; color: #64748b; font-size: 11px; font-weight: 600; gap: 4px;
+        }
+        .nav-item.active { color: #5b54e3; }
+        .nav-icon { font-size: 20px; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: flex-end; z-index: 1000;
+        }
+        .modal-content {
+            background: white; width: 100%; border-radius: 24px 24px 0 0;
+            padding: 24px; max-height: 80vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.3s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .m-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+        .m-desc { font-size: 14px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
+        .m-section { margin-bottom: 16px; }
+        .m-sec-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+        .m-sec-val { font-size: 15px; color: #0f172a; font-weight: 500; }
+        .m-close { 
+            width: 100%; padding: 14px; border-radius: 12px; background: #f1f5f9; 
+            color: #0f172a; font-weight: 700; border: none; margin-top: 24px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div style="flex: 1;"></div>
+    <button class="btn-logout" onclick="volunteerLogout()" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 14px; padding: 8px;">Logout 🚪</button>
+</div>
+
+<div class="container">
+    <h1 class="greeting" id="greeting">Good evening, ...</h1>
+    <p class="sub-greeting">You're assigned to 1 event today</p>
+
+    <div class="event-card" id="eventCard" style="display:none; cursor: pointer;" onclick="openDetailsModal()">
+        <div class="card-badge">Today's event</div>
+        <h2 class="event-title" id="eventTitle">Loading Event...</h2>
+        <p class="event-meta" id="eventMeta">...</p>
+        <p class="event-details" id="eventDetails">...</p>
+
+        <button class="btn-primary" onclick="event.stopPropagation(); window.location.href='volunteer_scan.html'">
+            <span>🔲</span> Open QR Scanner
+        </button>
+    </div>
+    
+    <div id="noEventMsg" style="text-align: center; color: #64748b; margin-top: 40px; display: none;">
+        No active volunteer event found.
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal-overlay" id="detailsModal" onclick="closeDetailsModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div style="width:40px; height:4px; background:#cbd5e1; border-radius:2px; margin:0 auto 16px auto;"></div>
+        <h2 class="m-title" id="mTitle">Event Title</h2>
+        <p class="m-desc" id="mDesc">Description goes here</p>
+        
+        <div class="m-section">
+            <div class="m-sec-title">📅 Date & Time</div>
+            <div class="m-sec-val" id="mTime">...</div>
+        </div>
+        
+        <div class="m-section">
+            <div class="m-sec-title">📍 Venue</div>
+            <div class="m-sec-val" id="mVenue">...</div>
+        </div>
+        
+        <div class="m-section">
+            <div class="m-sec-title">⚙️ Security Settings</div>
+            <div class="m-sec-val" id="mSecurity">...</div>
+        </div>
+
+        <button class="m-close" onclick="closeDetailsModal()">Close</button>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <a href="volunteer_dashboard.html" class="nav-item active"><span class="nav-icon">⊞</span><span>Dashboard</span></a>
+    <a href="volunteer_scan.html" class="nav-item"><span class="nav-icon">🔲</span><span>Scan</span></a>
+    <a href="volunteer_participants.html" class="nav-item"><span class="nav-icon">👥</span><span>Participants</span></a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let currentEventData = null;
+
+    async function init() {
+        const userId = localStorage.getItem('volunteer_user_id');
+        const eventId = localStorage.getItem('volunteer_event_id');
+        
+        if (!userId || !eventId) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Get User Name
+        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', userId).maybeSingle();
+        if (profile) {
+            const hour = new Date().getHours();
+            let greet = 'Good evening';
+            if (hour < 12) greet = 'Good morning';
+            else if (hour < 17) greet = 'Good afternoon';
+            
+            const firstName = profile.full_name.split(' ')[0];
+            document.getElementById('greeting').textContent = `${greet}, ${firstName}`;
+        }
+
+        // Get Event Info
+        const { data: ev } = await sb.from('events').select('*').eq('id', eventId).maybeSingle();
+        if (ev) {
+            currentEventData = ev;
+            document.getElementById('eventCard').style.display = 'block';
+            document.getElementById('eventTitle').textContent = ev.title;
+            
+            const dateStr = ev.start_date ? new Date(ev.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+            const timeStr = (ev.start_time || '') + (ev.end_time ? `–${ev.end_time}` : '');
+            document.getElementById('eventMeta').textContent = `${dateStr} · ${timeStr} · ${ev.venue_name || 'Online'}`;
+            
+            document.getElementById('eventDetails').textContent = `${ev.checkpoints_count || 4} checkpoints · ${ev.attendance_radius_meters || 100} m geofence · QR expires every ${ev.qr_refresh_interval_sec || 60}s`;
+        } else {
+            document.getElementById('noEventMsg').style.display = 'block';
+        }
+    }
+
+    function openDetailsModal() {
+        if (!currentEventData) return;
+        const ev = currentEventData;
+        
+        document.getElementById('mTitle').textContent = ev.title;
+        document.getElementById('mDesc').textContent = ev.description || 'No description provided.';
+        
+        const dateStr = ev.start_date ? new Date(ev.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+        const timeStr = (ev.start_time || '') + (ev.end_time ? ` to ${ev.end_time}` : '');
+        document.getElementById('mTime').textContent = `${dateStr} \n ${timeStr}`;
+        
+        const venue = ev.venue_name || 'Online / TBA';
+        const addr = ev.address ? `\n${ev.address}` : '';
+        document.getElementById('mVenue').innerText = venue + addr;
+        
+        document.getElementById('mSecurity').innerHTML = `
+            <b>Checkpoints:</b> ${ev.checkpoints_count || 4}<br>
+            <b>Geofence Radius:</b> ${ev.attendance_radius_meters || 100} meters<br>
+            <b>Dynamic QR Refresh:</b> ${ev.qr_refresh_interval_sec || 60} seconds
+        `;
+        
+        document.getElementById('detailsModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetailsModal(e) {
+        if (e && e.target !== document.getElementById('detailsModal')) return;
+        document.getElementById('detailsModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function volunteerLogout() {
+        localStorage.removeItem('volunteer_code');
+        localStorage.removeItem('volunteer_user_id');
+        localStorage.removeItem('volunteer_event_id');
+        localStorage.removeItem('volunteer_id');
+        window.location.href = 'index.html';
+    }
+
+    init();
+</script>
+</body>
+</html>

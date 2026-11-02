@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Event Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* Top Bar */
+        .top-bar { background: white; padding: 16px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .btn-back { background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .top-title { font-size: 18px; font-weight: 700; flex: 1; color: #0f172a; }
+
+        /* Banner */
+        .banner-container { position: relative; }
+        .event-banner { width: 100%; height: 220px; object-fit: cover; display: block; background: #e2e8f0; }
+        .banner-placeholder { width: 100%; height: 220px; background: linear-gradient(135deg, #e0e7ff, #f1f5f9); display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 40px; }
+        .banner-edit-btn { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
+
+        /* Container */
+        .container { max-width: 640px; margin: 0 auto; padding: 24px 20px; }
+
+        /* Section Cards */
+        .section-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .section-title { font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+        /* Form Fields */
+        .field-group { margin-bottom: 16px; }
+        .field-label { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; display: block; }
+        .field-input, .field-select, .field-textarea {
+            width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 15px; color: #0f172a; outline: none; background: white; font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: #5b54e3; }
+        .field-textarea { resize: vertical; min-height: 80px; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+        /* Status badge */
+        .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; text-transform: capitalize; margin-bottom: 16px; }
+        .status-upcoming { background: #eef2ff; color: #3b35a8; }
+        .status-ongoing { background: #dcfce7; color: #166534; }
+        .status-completed { background: #f1f5f9; color: #475569; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+        /* Guests / Sessions repeater */
+        .repeater-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 12px; position: relative; }
+        .repeater-remove { position: absolute; top: 12px; right: 12px; background: none; border: none; font-size: 18px; color: #ef4444; cursor: pointer; }
+
+        /* Action Buttons */
+        .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+        .btn-add { background: #f1f5f9; color: #475569; border: 1.5px dashed #cbd5e1; border-radius: 10px; padding: 12px; width: 100%; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-add:hover { background: #e2e8f0; }
+        .btn-save { flex: 1; background: #5b54e3; color: white; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .btn-save:hover { background: #4a44b8; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-delete { background: #fee2e2; color: #ef4444; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+        /* Status selector */
+        .status-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .status-opt { padding: 8px 16px; border-radius: 20px; border: 2px solid #e2e8f0; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .status-opt.selected { border-color: #5b54e3; background: #eef2ff; color: #3b35a8; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(40px); background: #0f172a; color: white; padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Loading */
+        .loading-screen { text-align: center; padding: 80px 24px; color: #64748b; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top-color: #5b54e3; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Map visualizer */
+        .geo-preview { background: linear-gradient(135deg, #e0e7ff, #ddd6fe); border-radius: 12px; padding: 16px; text-align: center; margin-top: 8px; }
+        .geo-preview-text { font-size: 13px; color: #5b54e3; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="btn-back" onclick="window.location.href='events.html'">←</button>
+        <span class="top-title" id="pageTitle">Event Details</span>
+        <span id="statusBadge" class="status-badge status-upcoming">upcoming</span>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <p>Loading event details...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" style="display:none;">
+
+        <!-- Banner -->
+        <div class="banner-container">
+            <div id="bannerArea">
+                <div class="banner-placeholder" id="bannerPlaceholder">📅</div>
+                <img id="bannerImg" class="event-banner" style="display:none;" src="" alt="Banner">
+            </div>
+            <button class="banner-edit-btn" onclick="document.getElementById('bannerUpload').click()">📷 Change Photo</button>
+            <input type="file" id="bannerUpload" accept="image/*" style="display:none;" onchange="handleBannerChange(this)">
+        </div>
+
+        <div class="container">
+
+            <!-- Basic Info -->
+            <div class="section-card">
+                <div class="section-title">📋 Basic Information</div>
+                <div class="field-group">
+                    <label class="field-label">Event Title *</label>
+                    <input type="text" class="field-input" id="f_title" placeholder="e.g. AI Innovation Summit">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Description</label>
+                    <textarea class="field-textarea" id="f_description" placeholder="What is this event about?"></textarea>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Category</label>
+                        <select class="field-select" id="f_category">
+                            <option value="">Select category</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Seminar">Seminar</option>
+                            <option value="Hackathon">Hackathon</option>
+                            <option value="Cultural">Cultural</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Webinar">Webinar</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Status</label>
+                        <select class="field-select" id="f_status">
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="section-card">
+                <div class="section-title">📅 Date & Time</div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Start Date</label>
+                        <input type="date" class="field-input" id="f_start_date">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Start Time</label>
+                        <input type="time" class="field-input" id="f_start_time">
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">End Date</label>
+                        <input type="date" class="field-input" id="f_end_date">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">End Time</label>
+                        <input type="time" class="field-input" id="f_end_time">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="section-card">
+                <div class="section-title">📍 Location</div>
+                <div class="field-group">
+                    <label class="field-label">Venue Name</label>
+                    <input type="text" class="field-input" id="f_venue_name" placeholder="e.g. City Convention Centre">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Address</label>
+                    <input type="text" class="field-input" id="f_address" placeholder="Full address">
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Latitude</label>
+                        <input type="number" class="field-input" id="f_latitude" step="any" placeholder="0.000000">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Longitude</label>
+                        <input type="number" class="field-input" id="f_longitude" step="any" placeholder="0.000000">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Attendance Radius (meters)</label>
+                    <input type="number" class="field-input" id="f_radius" placeholder="100">
+                </div>
+                <div class="geo-preview" id="geoPreview">
+                    <div class="geo-preview-text" id="geoText">📡 Geofence: Set coordinates above</div>
+                </div>
+            </div>
+
+            <!-- Guests / Speakers -->
+            <div class="section-card">
+                <div class="section-title">🎤 Guests / Speakers</div>
+                <div id="guestsContainer"></div>
+                <button class="btn-add" onclick="addGuestRow()">+ Add Guest</button>
+            </div>
+
+            <!-- Sessions -->
+            <div class="section-card">
+                <div class="section-title">🗓️ Sessions</div>
+                <div id="sessionsContainer"></div>
+                <button class="btn-add" onclick="addSessionRow()">+ Add Session</button>
+            </div>
+
+            <!-- Attendance Rules -->
+            <div class="section-card">
+                <div class="section-title">📋 Attendance Rules</div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Checkpoints</label>
+                        <input type="number" class="field-input" id="f_checkpoints_count" placeholder="4">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Checkpoint Timing</label>
+                        <select class="field-select" id="f_checkpoint_timing">
+                            <option value="fixed">Fixed</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label">Min Attendance %</label>
+                        <input type="number" class="field-input" id="f_min_attendance" placeholder="80" min="0" max="100">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">QR Refresh (sec)</label>
+                        <input type="number" class="field-input" id="f_qr_refresh" placeholder="10">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save / Delete -->
+            <div class="btn-row">
+                <button class="btn-save" id="saveBtn" onclick="saveEvent()">💾 Save Changes</button>
+                <button class="btn-delete" onclick="confirmDelete()">🗑️</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Get event ID from URL
+        const params = new URLSearchParams(window.location.search);
+        const eventId = params.get('id');
+
+        let currentEvent = null;
+        let sessionToken = null;
+        let existingGuests = [];
+        let existingSessions = [];
+        let newBannerFile = null;
+
+        async function main() {
+            if (!eventId) {
+                window.location.href = 'events.html';
+                return;
+            }
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'index.html'; return; }
+            sessionToken = session.access_token;
+
+            // Fetch event
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${eventId}&select=*`, {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+            });
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                alert('Event not found.');
+                window.location.href = 'events.html';
+                return;
+            }
+            currentEvent = data[0];
+
+            // Fetch guests
+            const gRes = await fetch(`${SUPABASE_URL}/rest/v1/event_guests?event_id=eq.${eventId}&select=*`, {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+            });
+            existingGuests = await gRes.json() || [];
+
+            // Fetch sessions
+            const sRes = await fetch(`${SUPABASE_URL}/rest/v1/event_sessions?event_id=eq.${eventId}&select=*`, {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+            });
+            existingSessions = await sRes.json() || [];
+
+            populateForm();
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function computeStatus(ev) {
+            if ((ev.status || '').toLowerCase() === 'cancelled') return 'cancelled';
+            const now = new Date();
+            let startDt = null;
+            if (ev.start_date) {
+                const t = ev.start_time ? ev.start_time.substring(0, 5) : '00:00';
+                startDt = new Date(`${ev.start_date}T${t}:00`);
+            }
+            let endDt = null;
+            if (ev.end_date) {
+                const t = ev.end_time ? ev.end_time.substring(0, 5) : '23:59';
+                endDt = new Date(`${ev.end_date}T${t}:00`);
+            }
+            if (!startDt) return (ev.status || 'upcoming').toLowerCase();
+            if (now < startDt) return 'upcoming';
+            if (endDt && now > endDt) return 'completed';
+            return 'ongoing';
+        }
+
+        function populateForm() {
+            const ev = currentEvent;
+
+            document.getElementById('pageTitle').textContent = ev.title || 'Event Details';
+
+            // Status badge — computed from date/time
+            const status = computeStatus(ev);
+            const badge = document.getElementById('statusBadge');
+            badge.textContent = status;
+            badge.className = `status-badge status-${status}`;
+
+            // Banner
+            if (ev.banner_image_url) {
+                document.getElementById('bannerPlaceholder').style.display = 'none';
+                const img = document.getElementById('bannerImg');
+                img.src = ev.banner_image_url;
+                img.style.display = 'block';
+            }
+
+            // Basic info
+            document.getElementById('f_title').value = ev.title || '';
+            document.getElementById('f_description').value = ev.description || '';
+            setSelectValue('f_category', ev.category);
+            setSelectValue('f_status', ev.status || 'upcoming');
+
+            // Dates
+            document.getElementById('f_start_date').value = ev.start_date || '';
+            document.getElementById('f_start_time').value = ev.start_time ? ev.start_time.substring(0, 5) : '';
+            document.getElementById('f_end_date').value = ev.end_date || '';
+            document.getElementById('f_end_time').value = ev.end_time ? ev.end_time.substring(0, 5) : '';
+
+            // Location
+            document.getElementById('f_venue_name').value = ev.venue_name || '';
+            document.getElementById('f_address').value = ev.address || '';
+            document.getElementById('f_latitude').value = ev.latitude || '';
+            document.getElementById('f_longitude').value = ev.longitude || '';
+            document.getElementById('f_radius').value = ev.attendance_radius_meters || '';
+            updateGeoPreview();
+
+            // Rules
+            document.getElementById('f_checkpoints_count').value = ev.checkpoints_count || '';
+            setSelectValue('f_checkpoint_timing', ev.checkpoint_timing);
+            document.getElementById('f_min_attendance').value = ev.min_attendance_percent || '';
+            document.getElementById('f_qr_refresh').value = ev.qr_refresh_interval_sec || '';
+
+            // Guests
+            if (existingGuests.length > 0) {
+                existingGuests.forEach(g => addGuestRow(g));
+            } else {
+                addGuestRow();
+            }
+
+            // Sessions
+            if (existingSessions.length > 0) {
+                existingSessions.forEach(s => addSessionRow(s));
+            } else {
+                addSessionRow();
+            }
+
+            // Listen for geo changes
+            ['f_latitude', 'f_longitude', 'f_radius'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateGeoPreview);
+            });
+
+            // Status badge update
+            document.getElementById('f_status').addEventListener('change', (e) => {
+                const s = e.target.value;
+                const badge = document.getElementById('statusBadge');
+                badge.textContent = s;
+                badge.className = `status-badge status-${s}`;
+            });
+        }
+
+        function setSelectValue(id, value) {
+            const el = document.getElementById(id);
+            if (!value) return;
+            for (let opt of el.options) {
+                if (opt.value.toLowerCase() === value.toLowerCase()) { opt.selected = true; return; }
+            }
+        }
+
+        function updateGeoPreview() {
+            const lat = document.getElementById('f_latitude').value;
+            const lng = document.getElementById('f_longitude').value;
+            const r = document.getElementById('f_radius').value;
+            const text = document.getElementById('geoText');
+            if (lat && lng && r) {
+                text.textContent = `📡 Geofence: ${r}m radius at (${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)})`;
+            } else {
+                text.textContent = '📡 Geofence: Set coordinates above';
+            }
+        }
+
+        function addGuestRow(data = {}) {
+            const container = document.getElementById('guestsContainer');
+            const div = document.createElement('div');
+            div.className = 'repeater-item';
+            div.dataset.id = data.id || '';
+            div.innerHTML = `
+                <button class="repeater-remove" onclick="this.parentElement.remove()">✕</button>
+                <div class="field-group"><label class="field-label">Name</label><input class="field-input g_name" type="text" placeholder="Guest name" value="${data.name || ''}"></div>
+                <div class="field-row">
+                    <div class="field-group"><label class="field-label">Role / Title</label><input class="field-input g_role" type="text" placeholder="e.g. Keynote Speaker" value="${data.role || ''}"></div>
+                    <div class="field-group"><label class="field-label">Organisation</label><input class="field-input g_org" type="text" placeholder="e.g. Google" value="${data.organisation || ''}"></div>
+                </div>
+                <div class="field-group"><label class="field-label">Bio (optional)</label><textarea class="field-textarea g_bio" placeholder="Short bio...">${data.bio || ''}</textarea></div>
+            `;
+            container.appendChild(div);
+        }
+
+        function addSessionRow(data = {}) {
+            const container = document.getElementById('sessionsContainer');
+            const div = document.createElement('div');
+            div.className = 'repeater-item';
+            div.dataset.id = data.id || '';
+            div.innerHTML = `
+                <button class="repeater-remove" onclick="this.parentElement.remove()">✕</button>
+                <div class="field-group"><label class="field-label">Session Title</label><input class="field-input s_title" type="text" placeholder="e.g. Opening Keynote" value="${data.title || ''}"></div>
+                <div class="field-row">
+                    <div class="field-group"><label class="field-label">Start Time</label><input class="field-input s_start" type="time" value="${data.start_time ? data.start_time.substring(0,5) : ''}"></div>
+                    <div class="field-group"><label class="field-label">End Time</label><input class="field-input s_end" type="time" value="${data.end_time ? data.end_time.substring(0,5) : ''}"></div>
+                </div>
+                <div class="field-group"><label class="field-label">Speaker</label><input class="field-input s_speaker" type="text" placeholder="Speaker name" value="${data.speaker_name || ''}"></div>
+                <div class="field-group"><label class="field-label">Location / Room</label><input class="field-input s_location" type="text" placeholder="e.g. Hall A" value="${data.location || ''}"></div>
+            `;
+            container.appendChild(div);
+        }
+
+        function handleBannerChange(input) {
+            const file = input.files[0];
+            if (!file) return;
+            newBannerFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('bannerPlaceholder').style.display = 'none';
+                const img = document.getElementById('bannerImg');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveEvent() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.textContent = '💾 Saving...';
+
+            try {
+                let bannerUrl = currentEvent.banner_image_url || null;
+
+                // Upload new banner if changed
+                if (newBannerFile) {
+                    const fileName = `banners/${eventId}-${Date.now()}.${newBannerFile.name.split('.').pop()}`;
+                    const uploadRes = await fetch(
+                        `${SUPABASE_URL}/storage/v1/object/event_banners/${fileName}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': 'Bearer ' + sessionToken,
+                                'Content-Type': newBannerFile.type
+                            },
+                            body: newBannerFile
+                        }
+                    );
+                    if (uploadRes.ok) {
+                        bannerUrl = `${SUPABASE_URL}/storage/v1/object/public/event_banners/${fileName}`;
+                    }
+                }
+
+                // Build update payload
+                const payload = {
+                    title: document.getElementById('f_title').value.trim(),
+                    description: document.getElementById('f_description').value.trim(),
+                    category: document.getElementById('f_category').value,
+                    status: document.getElementById('f_status').value,
+                    start_date: document.getElementById('f_start_date').value || null,
+                    start_time: document.getElementById('f_start_time').value || null,
+                    end_date: document.getElementById('f_end_date').value || null,
+                    end_time: document.getElementById('f_end_time').value || null,
+                    venue_name: document.getElementById('f_venue_name').value.trim(),
+                    address: document.getElementById('f_address').value.trim(),
+                    latitude: parseFloat(document.getElementById('f_latitude').value) || null,
+                    longitude: parseFloat(document.getElementById('f_longitude').value) || null,
+                    attendance_radius_meters: parseInt(document.getElementById('f_radius').value) || null,
+                    checkpoints_count: parseInt(document.getElementById('f_checkpoints_count').value) || null,
+                    checkpoint_timing: document.getElementById('f_checkpoint_timing').value,
+                    min_attendance_percent: parseInt(document.getElementById('f_min_attendance').value) || null,
+                    qr_refresh_interval_sec: parseInt(document.getElementById('f_qr_refresh').value) || null,
+                    banner_image_url: bannerUrl
+                };
+
+                // Update event
+                const updateRes = await fetch(
+                    `${SUPABASE_URL}/rest/v1/events?id=eq.${eventId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + sessionToken,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                if (!updateRes.ok) {
+                    const errText = await updateRes.text();
+                    throw new Error('Failed to update event: ' + errText);
+                }
+
+                // Update guests: delete old, insert new
+                await fetch(`${SUPABASE_URL}/rest/v1/event_guests?event_id=eq.${eventId}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+                });
+
+                const guestItems = document.querySelectorAll('#guestsContainer .repeater-item');
+                const guests = [];
+                guestItems.forEach(item => {
+                    const name = item.querySelector('.g_name').value.trim();
+                    if (name) {
+                        guests.push({
+                            event_id: eventId,
+                            name,
+                            role: item.querySelector('.g_role').value.trim(),
+                            organisation: item.querySelector('.g_org').value.trim(),
+                            bio: item.querySelector('.g_bio').value.trim()
+                        });
+                    }
+                });
+                if (guests.length > 0) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/event_guests`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + sessionToken,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(guests)
+                    });
+                }
+
+                // Update sessions: delete old, insert new
+                await fetch(`${SUPABASE_URL}/rest/v1/event_sessions?event_id=eq.${eventId}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+                });
+
+                const sessionItems = document.querySelectorAll('#sessionsContainer .repeater-item');
+                const sessions = [];
+                sessionItems.forEach(item => {
+                    const title = item.querySelector('.s_title').value.trim();
+                    if (title) {
+                        sessions.push({
+                            event_id: eventId,
+                            title,
+                            start_time: item.querySelector('.s_start').value || null,
+                            end_time: item.querySelector('.s_end').value || null,
+                            speaker_name: item.querySelector('.s_speaker').value.trim(),
+                            location: item.querySelector('.s_location').value.trim()
+                        });
+                    }
+                });
+                if (sessions.length > 0) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/event_sessions`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + sessionToken,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(sessions)
+                    });
+                }
+
+                showToast('✅ Event saved successfully!');
+                document.getElementById('pageTitle').textContent = payload.title || 'Event Details';
+                currentEvent = { ...currentEvent, ...payload };
+
+            } catch (err) {
+                showToast('❌ Error: ' + err.message);
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Changes';
+            }
+        }
+
+        async function confirmDelete() {
+            if (!confirm('Are you sure you want to delete this event? This cannot be undone.')) return;
+
+            const btn = document.querySelector('.btn-delete');
+            btn.textContent = '🗑️ Deleting...';
+            btn.disabled = true;
+
+            try {
+                // Delete guests first
+                const gRes = await fetch(`${SUPABASE_URL}/rest/v1/event_guests?event_id=eq.${eventId}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+                });
+
+                // Delete sessions
+                const sRes = await fetch(`${SUPABASE_URL}/rest/v1/event_sessions?event_id=eq.${eventId}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + sessionToken }
+                });
+
+                // Delete event
+                const eRes = await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${eventId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': 'Bearer ' + sessionToken,
+                        'Prefer': 'return=minimal'
+                    }
+                });
+
+                if (!eRes.ok) {
+                    const errText = await eRes.text();
+                    throw new Error(`Delete failed (${eRes.status}): ${errText}`);
+                }
+
+                showToast('🗑️ Event deleted!');
+                setTimeout(() => window.location.href = 'events.html', 1200);
+
+            } catch (err) {
+                showToast('❌ ' + err.message);
+                console.error(err);
+                btn.textContent = '🗑️';
+                btn.disabled = false;
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        main();
+    
+    // Global Sidebar and Menu logic injected by update script
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>

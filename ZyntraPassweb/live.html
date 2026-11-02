@@ -1,0 +1,489 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass – Participants</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge-notif {
+            position: absolute; top: -2px; right: -4px; background: #ef4444;
+            color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .avatar {
+            width: 40px; height: 40px; background: #e0e7ff; color: #5b54e3;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+
+        /* ── Container ── */
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+        /* ── Page heading ── */
+        .page-title { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 24px; }
+
+        /* ── Event list cards ── */
+        .event-item {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 16px; margin-bottom: 16px; display: flex; align-items: center;
+            gap: 14px; cursor: pointer; transition: box-shadow 0.2s;
+        }
+        .event-item:hover { box-shadow: 0 4px 16px rgba(91,84,227,0.1); border-color: #c7d2fe; }
+        .event-thumb {
+            width: 60px; height: 60px; border-radius: 12px; object-fit: cover;
+            background: #e2e8f0; flex-shrink: 0; display: flex;
+            align-items: center; justify-content: center; font-size: 22px;
+        }
+        .event-item-body { flex: 1; min-width: 0; }
+        .event-item-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-status-chip {
+            display: inline-block; font-size: 11px; font-weight: 600;
+            padding: 3px 10px; border-radius: 20px; text-transform: capitalize; margin-bottom: 6px;
+        }
+        .chip-upcoming  { background: #eef2ff; color: #3b35a8; }
+        .chip-ongoing   { background: #dcfce7; color: #166534; }
+        .chip-completed { background: #f1f5f9; color: #475569; }
+        .chip-cancelled { background: #fee2e2; color: #991b1b; }
+
+        .event-meta { font-size: 12px; color: #64748b; }
+        .pending-badge {
+            background: #fff4e5; color: #d97706; font-size: 12px; font-weight: 700;
+            padding: 6px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+        }
+        .pending-badge.zero { background: #f1f5f9; color: #94a3b8; }
+
+        /* ── Back button (detail view) ── */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: none; font-size: 15px; font-weight: 600;
+            color: #5b54e3; cursor: pointer; margin-bottom: 20px; padding: 0;
+        }
+        .back-btn:hover { opacity: 0.75; }
+
+        /* ── Summary strip ── */
+        .summary-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 10px; margin-bottom: 24px;
+        }
+        .summary-box {
+            background: white; border: 1px solid #e2e8f0; border-radius: 14px;
+            padding: 14px 10px; text-align: center;
+        }
+        .summary-box .s-val { font-size: 22px; font-weight: 800; color: #0d162a; }
+        .summary-box .s-lbl { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+        .summary-box.pending  .s-val { color: #d97706; }
+        .summary-box.accepted .s-val { color: #16a34a; }
+        .summary-box.rejected .s-val { color: #dc2626; }
+
+        /* ── Participant cards ── */
+        .participant-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 16px; margin-bottom: 14px;
+        }
+        .p-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .p-avatar {
+            width: 48px; height: 48px; border-radius: 50%; background: #e0e7ff;
+            color: #5b54e3; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px; flex-shrink: 0;
+        }
+        .p-info { flex: 1; min-width: 0; }
+        .p-name { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-sub  { font-size: 12px; color: #64748b; }
+        .p-status-chip {
+            font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .s-pending  { background: #fff4e5; color: #d97706; }
+        .s-approved { background: #dcfce7; color: #16a34a; }
+        .s-rejected { background: #fee2e2; color: #dc2626; }
+        .s-attended { background: #e0e7ff; color: #5b54e3; }
+
+        .p-card-actions { display: flex; gap: 10px; }
+        .btn-accept, .btn-reject {
+            flex: 1; padding: 10px; border-radius: 12px; font-size: 14px; font-weight: 700;
+            cursor: pointer; border: none; transition: opacity 0.2s;
+        }
+        .btn-accept { background: #16a34a; color: white; }
+        .btn-reject { background: #fee2e2; color: #dc2626; }
+        .btn-accept:disabled, .btn-reject:disabled { opacity: 0.4; cursor: default; }
+        .btn-accept:not(:disabled):hover { background: #15803d; }
+        .btn-reject:not(:disabled):hover { background: #fecaca; }
+
+        /* ── Empty / Loading states ── */
+        .empty-state {
+            text-align: center; padding: 48px 24px; color: #64748b;
+        }
+        .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state .es-title { font-size: 16px; font-weight: 700; color: #0d162a; margin-bottom: 6px; }
+
+        .loading-text { text-align: center; color: #64748b; padding: 40px; }
+
+        /* ── Bottom Nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #64748b;
+            font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; gap: 4px;
+        }
+        .nav-item.active { color: #5b54e3; }
+        .nav-icon { font-size: 20px; }
+
+        /* ── Sidebar ── */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar-overlay.active { display: block; }
+        .sidebar { position: fixed; top: 0; left: -300px; bottom: 0; width: 300px; background: linear-gradient(180deg, #1A448C 0%, #0D162A 100%); z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; color: white; box-shadow: 4px 0 16px rgba(0,0,0,0.2); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo-icon { width: 40px; height: 40px; background-color: #5B54E3; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .sidebar-brand { font-size: 18px; font-weight: bold; margin: 0; }
+        .sidebar-subbrand { font-size: 12px; color: #A8B2D1; margin: 0; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-item { padding: 12px 24px; display: flex; align-items: center; gap: 16px; color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-footer .avatar { width: 40px; height: 40px; background-color: #3C4260; color: #A8B2D1; font-size: 14px; }
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { margin: 0; font-weight: bold; font-size: 14px; color: white; }
+        .sidebar-user-email { margin: 0; font-size: 11px; color: #A8B2D1; }
+        .sidebar-logout { font-size: 20px; color: #A8B2D1; cursor: pointer; }
+        .sidebar-logout:hover { color: white; }
+        /* ── Participant Modal ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .p-modal { background: white; border-radius: 24px; padding: 24px; width: 100%; max-width: 400px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .p-modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; }
+        .p-modal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .p-modal-avatar { width: 64px; height: 64px; border-radius: 50%; background: #e0e7ff; color: #5b54e3; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; flex-shrink: 0; }
+        .p-modal-name { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .p-modal-email { font-size: 14px; color: #64748b; }
+        .p-detail-item { margin-bottom: 16px; }
+        .p-detail-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+        .p-detail-val { font-size: 15px; color: #0f172a; }
+        .p-modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .p-modal-actions .btn-accept, .p-modal-actions .btn-reject { padding: 14px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo-icon">✨</div>
+        <div>
+            <p class="sidebar-brand">ZyntraPass</p>
+            <p class="sidebar-subbrand">Organizer workspace</p>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="events.html" class="sidebar-item"><span>📅</span> Events</a>
+        <a href="participants.html" class="sidebar-item"><span>👥</span> Participants</a>
+        <a href="live.html" class="sidebar-item active"><span>📡</span> Live Attendance</a>
+        <a href="volunteers.html" class="sidebar-item"><span>🤝</span> Volunteers</a>
+        <a href="certificates.html" class="sidebar-item"><span>📜</span> Certificates</a>
+        <a href="settings.html" class="sidebar-item"><span>⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="avatar" id="sidebar-avatar">--</div>
+        <div class="sidebar-user-info">
+            <p class="sidebar-user-name" id="sidebar-name">Loading...</p>
+            <p class="sidebar-user-email" id="sidebar-email">...</p>
+        </div>
+        <div class="sidebar-logout" id="sidebar-logout">🚪</div>
+    </div>
+</div>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn">☰</button>
+    </div>
+
+<!-- ── Main Content ── -->
+<div class="container" id="main-container">
+    <p class="loading-text">Loading...</p>
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⚏</span><span>Dashboard</span></a>
+    <a href="events.html"    class="nav-item"><span class="nav-icon">📅</span><span>Events</span></a>
+    <a href="participants.html" class="nav-item active"><span class="nav-icon">👥</span><span>Participants</span></a>
+    <a href="live.html" class="nav-item"><span class="nav-icon">📡</span><span>Live</span></a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+    let sb, currentUserId;
+    
+    const navItems = document.querySelectorAll('.sidebar-item, .nav-item');
+    navItems.forEach(el => {
+        if(el.textContent.includes('Live')) el.classList.add('active');
+        else el.classList.remove('active');
+    });
+    document.querySelectorAll('.sidebar-item, .nav-item').forEach(el => {
+        if(el.textContent.includes('Live')) el.href = 'live.html';
+        if(el.textContent.includes('Participants')) el.href = 'participants.html';
+        if(el.textContent.includes('Events')) el.href = 'events.html';
+        if(el.textContent.includes('Dashboard')) el.href = 'dashboard.html';
+    });
+
+    async function main() {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+        currentUserId = session.user.id;
+        loadEvents();
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    
+    function computeStatus(ev) {
+        const now = new Date();
+        const startStr = ev.start_date ? ev.start_date + 'T' + (ev.start_time || '00:00:00') : null;
+        const endStr = ev.end_date ? ev.end_date + 'T' + (ev.end_time || '23:59:59') : null;
+        const start = startStr ? new Date(startStr) : null;
+        const end = endStr ? new Date(endStr) : null;
+        if (!start || !end) return 'upcoming';
+        if (now < start) return 'upcoming';
+        if (now > end) return 'completed';
+        return 'ongoing';
+    }
+
+    let allEvents = [];
+    
+    async function loadEvents() {
+        const accessToken = (await sb.auth.getSession()).data.session.access_token;
+        const container = document.getElementById('main-container');
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b;">Loading ongoing events...</div>';
+        
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/events?organizer_id=eq.${currentUserId}&select=id,title,banner_image_url,start_date,end_date,checkpoints_count&order=created_at.desc`, {
+            headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken }
+        });
+        const events = await res.json();
+        
+        allEvents = events.filter(e => {
+            const st = computeStatus(e);
+            return st === 'ongoing' || st === 'upcoming' || st === 'completed';
+        });
+        
+        renderEventsList();
+    }
+
+    function renderEventsList() {
+        const container = document.getElementById('main-container');
+        if (allEvents.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;">No events to track.</div>';
+            return;
+        }
+
+        let html = '';
+        allEvents.forEach(ev => {
+            const status = computeStatus(ev);
+            const chipClass = `chip-${status}`;
+            const thumb = ev.banner_image_url 
+                ? `<img src="${escHtml(ev.banner_image_url)}" class="event-thumb" onerror="this.outerHTML='<div class=\'event-thumb\'>📍</div>'">`
+                : `<div class="event-thumb">📍</div>`;
+
+            html += `
+            <div class="event-item" onclick="renderLiveDetail('${ev.id}')">
+                ${thumb}
+                <div class="event-item-body">
+                    <div class="event-item-title">${escHtml(ev.title || 'Untitled')}</div>
+                    <span class="event-status-chip ${chipClass}">${status}</span>
+                </div>
+                <div style="font-size:24px; color:#cbd5e1;">&rsaquo;</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    let profileMap = {};
+    let liveInterval = null;
+
+    async function renderLiveDetail(eventId) {
+        const container = document.getElementById('main-container');
+        container.innerHTML = '<div style="text-align:center;padding:40px;">Fetching live GPS logs...</div>';
+        
+        const ev = allEvents.find(e => e.id === eventId);
+        const accessToken = (await sb.auth.getSession()).data.session.access_token;
+        
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/event_registrations?event_id=eq.${eventId}&status=eq.approved&select=id,attendee_id`, {
+            headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken, 'cache': 'no-store' }
+        });
+        const regs = await res.json();
+        
+        if (!Array.isArray(regs) || regs.length === 0) {
+            container.innerHTML = `
+                <button class="back-btn" onclick="renderEventsList()">🔙 Back</button>
+                <h1 class="page-title">${escHtml(ev.title)}</h1>
+                <div style="text-align:center;padding:40px;color:#64748b;">No approved participants to track.</div>
+            `;
+            return;
+        }
+
+        const uids = regs.map(r => `"${r.attendee_id}"`).join(',');
+        
+        // Fetch profiles
+        const pRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=in.(${uids})&select=id,full_name,email`, {
+            headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken }
+        });
+        const profiles = await pRes.json();
+        if (Array.isArray(profiles)) {
+            profiles.forEach(p => profileMap[p.id] = p);
+        }
+        
+        // Fetch attendee_profiles
+        const apRes = await fetch(`${SUPABASE_URL}/rest/v1/attendee_profiles?id=in.(${uids})&select=*`, {
+            headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken }
+        });
+        const aProfiles = await apRes.json();
+        if (Array.isArray(aProfiles)) {
+            aProfiles.forEach(p => {
+                if (!profileMap[p.id] || !profileMap[p.id].full_name) {
+                    profileMap[p.id] = { ...(profileMap[p.id] || {}), ...p };
+                }
+            });
+        }
+
+        fetchLiveStats(eventId, regs, ev);
+        
+        if (liveInterval) clearInterval(liveInterval);
+        liveInterval = setInterval(() => {
+            if (document.getElementById('main-container').innerHTML.includes('participant-grid')) {
+                fetchLiveStats(eventId, regs, ev, true);
+            } else {
+                clearInterval(liveInterval);
+            }
+        }, 10000);
+    }
+    
+    async function fetchLiveStats(eventId, regs, ev, isSilent = false) {
+        const container = document.getElementById('main-container');
+        const accessToken = (await sb.auth.getSession()).data.session.access_token;
+        
+        const logsRes = await fetch(`${SUPABASE_URL}/rest/v1/attendance_logs?event_id=eq.${eventId}&select=attendee_id,checkpoint_index`, {
+            headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken, 'cache': 'no-store' }
+        });
+        const allLogs = await logsRes.json();
+        
+        const cpCounts = {};
+        if (Array.isArray(allLogs)) {
+            allLogs.forEach(lg => {
+                cpCounts[lg.attendee_id] = (cpCounts[lg.attendee_id] || 0) + 1;
+            });
+        }
+        
+        const totalCp = ev.checkpoints_count || 4;
+        
+        const now = new Date();
+        const startStr = ev.start_date ? ev.start_date + 'T' + (ev.start_time || '00:00:00') : null;
+        const endStr = ev.end_date ? ev.end_date + 'T' + (ev.end_time || '23:59:59') : null;
+        const start = startStr ? new Date(startStr) : null;
+        const end = endStr ? new Date(endStr) : null;
+        let elapsedSessions = 0;
+        
+        if (start && end) {
+            if (now >= end) {
+                elapsedSessions = totalCp;
+            } else if (now >= start) {
+                const durationMs = end.getTime() - start.getTime();
+                const windowMs = durationMs / totalCp;
+                const elapsedMs = now.getTime() - start.getTime();
+                elapsedSessions = Math.floor(elapsedMs / windowMs);
+            }
+        }
+        
+        let html = `
+            <button class="back-btn" onclick="renderEventsList(); if(liveInterval) clearInterval(liveInterval);" style="margin-bottom:16px;">🔙 Back to Events</button>
+            <h1 class="page-title" style="margin-bottom:4px;">${escHtml(ev.title)}</h1>
+            <p class="page-subtitle">Live GPS Attendance Tracking • Auto-updates every 10s</p>
+            <div class="participant-grid" style="display:grid; gap:16px; margin-top:20px;">
+        `;
+        
+        regs.forEach(r => {
+            const p = profileMap[r.attendee_id] || {};
+            const name = p.full_name || 'Unknown Participant';
+            const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            
+            const attended = cpCounts[r.attendee_id] || 0;
+            const missed = Math.max(0, elapsedSessions - attended);
+            const remaining = Math.max(0, totalCp - elapsedSessions);
+            
+            const percent = Math.min(100, Math.round((attended / totalCp) * 100));
+            const barColor = percent >= 80 ? '#10b981' : (percent >= 50 ? '#f59e0b' : '#ef4444');
+            
+            html += `
+            <div class="event-item" style="display:flex; flex-direction:column; gap:12px; cursor:default; background:white; border-radius:16px; padding:16px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                <div style="align-items: center; display: flex; gap: 16px;">
+                    <div class="event-thumb" style="width:48px; height:48px; font-size:18px; border-radius:50%; background:#f1f5f9; color:#475569; display:flex; align-items:center; justify-content:center; font-weight:bold;">${initials}</div>
+                    <div style="flex:1;">
+                        <div class="event-item-title" style="font-size:16px; font-weight:700; color:#0f172a;">${escHtml(name)}</div>
+                        <div style="display:flex; gap:12px; margin-top:4px;">
+                            <span style="font-size:12px; font-weight:600; color:#10b981;">✅ ${attended} Attended</span>
+                            <span style="font-size:12px; font-weight:600; color:#ef4444;">❌ ${missed} Missed</span>
+                            <span style="font-size:12px; font-weight:600; color:#64748b;">⏳ ${remaining} Remaining</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:24px; font-weight:800; color:${barColor};">${percent}%</div>
+                        <div style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase;">Attendance</div>
+                    </div>
+                </div>
+                <div style="background:#f1f5f9; height:8px; border-radius:4px; overflow:hidden; width:100%;">
+                    <div style="background:${barColor}; width:${percent}%; height:100%; transition:width 0.5s ease;"></div>
+                </div>
+            </div>`;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    document.addEventListener("DOMContentLoaded", main);
+
+    // Global Sidebar and Menu logic injected by update script
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>
+

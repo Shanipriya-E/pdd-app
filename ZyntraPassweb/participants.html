@@ -1,0 +1,718 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass – Participants</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge-notif {
+            position: absolute; top: -2px; right: -4px; background: #ef4444;
+            color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .avatar {
+            width: 40px; height: 40px; background: #e0e7ff; color: #5b54e3;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+
+        /* ── Container ── */
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+        /* ── Page heading ── */
+        .page-title { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 24px; }
+
+        /* ── Event list cards ── */
+        .event-item {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 16px; margin-bottom: 16px; display: flex; align-items: center;
+            gap: 14px; cursor: pointer; transition: box-shadow 0.2s;
+        }
+        .event-item:hover { box-shadow: 0 4px 16px rgba(91,84,227,0.1); border-color: #c7d2fe; }
+        .event-thumb {
+            width: 60px; height: 60px; border-radius: 12px; object-fit: cover;
+            background: #e2e8f0; flex-shrink: 0; display: flex;
+            align-items: center; justify-content: center; font-size: 22px;
+        }
+        .event-item-body { flex: 1; min-width: 0; }
+        .event-item-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .event-status-chip {
+            display: inline-block; font-size: 11px; font-weight: 600;
+            padding: 3px 10px; border-radius: 20px; text-transform: capitalize; margin-bottom: 6px;
+        }
+        .chip-upcoming  { background: #eef2ff; color: #3b35a8; }
+        .chip-ongoing   { background: #dcfce7; color: #166534; }
+        .chip-completed { background: #f1f5f9; color: #475569; }
+        .chip-cancelled { background: #fee2e2; color: #991b1b; }
+
+        .event-meta { font-size: 12px; color: #64748b; }
+        .pending-badge {
+            background: #fff4e5; color: #d97706; font-size: 12px; font-weight: 700;
+            padding: 6px 12px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+        }
+        .pending-badge.zero { background: #f1f5f9; color: #94a3b8; }
+
+        /* ── Back button (detail view) ── */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: none; font-size: 15px; font-weight: 600;
+            color: #5b54e3; cursor: pointer; margin-bottom: 20px; padding: 0;
+        }
+        .back-btn:hover { opacity: 0.75; }
+
+        /* ── Summary strip ── */
+        .summary-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 10px; margin-bottom: 24px;
+        }
+        .summary-box {
+            background: white; border: 1px solid #e2e8f0; border-radius: 14px;
+            padding: 14px 10px; text-align: center;
+        }
+        .summary-box .s-val { font-size: 22px; font-weight: 800; color: #0d162a; }
+        .summary-box .s-lbl { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+        .summary-box.pending  .s-val { color: #d97706; }
+        .summary-box.accepted .s-val { color: #16a34a; }
+        .summary-box.rejected .s-val { color: #dc2626; }
+
+        /* ── Participant cards ── */
+        .participant-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 16px; margin-bottom: 14px;
+        }
+        .p-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .p-avatar {
+            width: 48px; height: 48px; border-radius: 50%; background: #e0e7ff;
+            color: #5b54e3; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px; flex-shrink: 0;
+        }
+        .p-info { flex: 1; min-width: 0; }
+        .p-name { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-sub  { font-size: 12px; color: #64748b; }
+        .p-status-chip {
+            font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .s-pending  { background: #fff4e5; color: #d97706; }
+        .s-approved { background: #dcfce7; color: #16a34a; }
+        .s-rejected { background: #fee2e2; color: #dc2626; }
+        .s-attended { background: #e0e7ff; color: #5b54e3; }
+
+        .p-card-actions { display: flex; gap: 10px; }
+        .btn-accept, .btn-reject {
+            flex: 1; padding: 10px; border-radius: 12px; font-size: 14px; font-weight: 700;
+            cursor: pointer; border: none; transition: opacity 0.2s;
+        }
+        .btn-accept { background: #16a34a; color: white; }
+        .btn-reject { background: #fee2e2; color: #dc2626; }
+        .btn-accept:disabled, .btn-reject:disabled { opacity: 0.4; cursor: default; }
+        .btn-accept:not(:disabled):hover { background: #15803d; }
+        .btn-reject:not(:disabled):hover { background: #fecaca; }
+
+        /* ── Empty / Loading states ── */
+        .empty-state {
+            text-align: center; padding: 48px 24px; color: #64748b;
+        }
+        .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state .es-title { font-size: 16px; font-weight: 700; color: #0d162a; margin-bottom: 6px; }
+
+        .loading-text { text-align: center; color: #64748b; padding: 40px; }
+
+        /* ── Bottom Nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #64748b;
+            font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; gap: 4px;
+        }
+        .nav-item.active { color: #5b54e3; }
+        .nav-icon { font-size: 20px; }
+
+        /* ── Sidebar ── */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar-overlay.active { display: block; }
+        .sidebar { position: fixed; top: 0; left: -300px; bottom: 0; width: 300px; background: linear-gradient(180deg, #1A448C 0%, #0D162A 100%); z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; color: white; box-shadow: 4px 0 16px rgba(0,0,0,0.2); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo-icon { width: 40px; height: 40px; background-color: #5B54E3; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .sidebar-brand { font-size: 18px; font-weight: bold; margin: 0; }
+        .sidebar-subbrand { font-size: 12px; color: #A8B2D1; margin: 0; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-item { padding: 12px 24px; display: flex; align-items: center; gap: 16px; color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-footer .avatar { width: 40px; height: 40px; background-color: #3C4260; color: #A8B2D1; font-size: 14px; }
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { margin: 0; font-weight: bold; font-size: 14px; color: white; }
+        .sidebar-user-email { margin: 0; font-size: 11px; color: #A8B2D1; }
+        .sidebar-logout { font-size: 20px; color: #A8B2D1; cursor: pointer; }
+        .sidebar-logout:hover { color: white; }
+        /* ── Participant Modal ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .p-modal { background: white; border-radius: 24px; padding: 24px; width: 100%; max-width: 400px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .p-modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; }
+        .p-modal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .p-modal-avatar { width: 64px; height: 64px; border-radius: 50%; background: #e0e7ff; color: #5b54e3; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; flex-shrink: 0; }
+        .p-modal-name { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .p-modal-email { font-size: 14px; color: #64748b; }
+        .p-detail-item { margin-bottom: 16px; }
+        .p-detail-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+        .p-detail-val { font-size: 15px; color: #0f172a; }
+        .p-modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .p-modal-actions .btn-accept, .p-modal-actions .btn-reject { padding: 14px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo-icon">✨</div>
+        <div>
+            <p class="sidebar-brand">ZyntraPass</p>
+            <p class="sidebar-subbrand">Organizer workspace</p>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="events.html" class="sidebar-item"><span>📅</span> Events</a>
+        <a href="participants.html" class="sidebar-item active"><span>👥</span> Participants</a>
+        <a href="live.html" class="sidebar-item"><span>📡</span> Live Attendance</a>
+        <a href="volunteers.html" class="sidebar-item"><span>🤝</span> Volunteers</a>
+        <a href="certificates.html" class="sidebar-item"><span>📜</span> Certificates</a>
+        <a href="settings.html" class="sidebar-item"><span>⚙️</span> Settings</a>
+    </div>
+    <div class="sidebar-footer">
+        <div class="avatar" id="sidebar-avatar">--</div>
+        <div class="sidebar-user-info">
+            <p class="sidebar-user-name" id="sidebar-name">Loading...</p>
+            <p class="sidebar-user-email" id="sidebar-email">...</p>
+        </div>
+        <div class="sidebar-logout" id="sidebar-logout">🚪</div>
+    </div>
+</div>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn">☰</button>
+    </div>
+
+<!-- ── Main Content ── -->
+<div class="container" id="main-container">
+    <p class="loading-text">Loading...</p>
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⚏</span><span>Dashboard</span></a>
+    <a href="events.html"    class="nav-item"><span class="nav-icon">📅</span><span>Events</span></a>
+    <a href="participants.html" class="nav-item active"><span class="nav-icon">👥</span><span>Participants</span></a>
+    <a href="live.html" class="nav-item"><span class="nav-icon">📡</span><span>Live</span></a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+    let sb, currentUserId, accessToken;
+    const container = document.getElementById('main-container');
+
+    // ────────────────────────────────
+    //  INIT
+    // ────────────────────────────────
+    async function main() {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+        // Auth check
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+
+        currentUserId = session.user.id;
+        accessToken   = session.access_token;
+
+        // Profile / avatar
+        const { data: profile } = await sb.from('profiles').select('full_name').eq('id', currentUserId).maybeSingle();
+        if (profile?.full_name) {
+            const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            (document.getElementById('userAvatar') || {}).textContent = initials;
+            document.getElementById('sidebar-avatar').textContent = initials;
+            document.getElementById('sidebar-name').textContent   = profile.full_name;
+        }
+        document.getElementById('sidebar-email').textContent = session.user.email;
+
+        // Sidebar wiring
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            sidebar.classList.add('active'); overlay.classList.add('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active'); overlay.classList.remove('active');
+        });
+        document.getElementById('sidebar-logout').addEventListener('click', async () => {
+            await sb.auth.signOut(); window.location.href = 'index.html';
+        });
+
+        // Render events list
+        await renderEventsList();
+    }
+
+    // ────────────────────────────────
+    //  VIEW 1 – EVENTS LIST
+    // ────────────────────────────────
+    async function renderEventsList() {
+        container.innerHTML = `<p class="loading-text">Loading events...</p>`;
+
+        // Fetch organizer's events
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/events?organizer_id=eq.${currentUserId}&select=*&order=created_at.desc`,
+            { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
+        );
+        const events = await res.json();
+
+        if (!Array.isArray(events) || events.length === 0) {
+            container.innerHTML = `
+                <h1 class="page-title">Participants</h1>
+                <p class="page-subtitle">Manage join requests across your events.</p>
+                <div class="empty-state">
+                    <div class="es-icon">📋</div>
+                    <div class="es-title">No events yet</div>
+                    <p>Create an event first to start receiving participant requests.</p>
+                </div>`;
+            return;
+        }
+
+        // For each event, count registrations by status
+        const eventIds = events.map(e => `"${e.id}"`).join(',');
+        const regRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/event_registrations?event_id=in.(${eventIds})&select=event_id,status`,
+            { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
+        );
+        const allRegs = await regRes.json();
+
+        // Build counts map: { eventId: { total, pending } }
+        const counts = {};
+        events.forEach(e => counts[e.id] = { total: 0, pending: 0 });
+        if (Array.isArray(allRegs)) {
+            allRegs.forEach(r => {
+                if (!counts[r.event_id]) return;
+                counts[r.event_id].total++;
+                if (r.status === 'registered') counts[r.event_id].pending++;
+            });
+        }
+
+        // Render
+        let html = `
+            <h1 class="page-title">Participants</h1>
+            <p class="page-subtitle">Tap an event to review and manage join requests.</p>
+        `;
+
+        events.forEach(ev => {
+            const status = computeStatus(ev);
+            const chipClass = `chip-${status}`;
+            const thumb = ev.banner_image_url
+                ? `<img src="${escHtml(ev.banner_image_url)}" class="event-thumb" onerror="this.outerHTML='<div class=\\'event-thumb\\'>📅</div>'">`
+                : `<div class="event-thumb">📅</div>`;
+            const c = counts[ev.id] || { total: 0, pending: 0 };
+            const pbClass = c.pending === 0 ? 'pending-badge zero' : 'pending-badge';
+            const pbLabel = c.pending === 0 ? 'No pending' : `${c.pending} pending`;
+
+            const safeTitle = (ev.title || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            html += `
+            <div class="event-item" onclick="renderEventDetail('${ev.id}', '${safeTitle}')">
+                ${thumb}
+                <div class="event-item-body">
+                    <div class="event-item-title">${escHtml(ev.title || 'Untitled')}</div>
+                    <span class="event-status-chip ${chipClass}">${status}</span>
+                    <div class="event-meta">${c.total} request${c.total !== 1 ? 's' : ''} total</div>
+                </div>
+                <div class="${pbClass}">${pbLabel}</div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // ────────────────────────────────
+    //  VIEW 2 – EVENT DETAIL / PARTICIPANTS
+    // ────────────────────────────────
+    async function renderEventDetail(eventId, eventTitle) {
+        container.innerHTML = `<p class="loading-text">Loading participants...</p>`;
+
+        // Fetch registrations for this event
+        const res = await fetch(
+            `${SUPABASE_URL}/rest/v1/event_registrations?event_id=eq.${eventId}&select=*&order=created_at.asc`,
+            { 
+                headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken },
+                cache: 'no-store'
+            }
+        );
+        const regs = await res.json();
+
+        if (!Array.isArray(regs)) {
+            container.innerHTML = `<p style="color:red;text-align:center;padding:20px">Error loading registrations.</p>`;
+            return;
+        }
+
+        // Fetch profiles for all attendee_ids
+        profileMap = {};
+        if (regs.length > 0) {
+            const uids = regs.map(r => `"${r.attendee_id}"`).join(',');
+            const pRes = await fetch(
+                `${SUPABASE_URL}/rest/v1/profiles?id=in.(${uids})&select=*`,
+                { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
+            );
+            const profiles = await pRes.json();
+            if (Array.isArray(profiles)) {
+                profiles.forEach(p => profileMap[p.id] = p);
+            }
+            
+            const apRes = await fetch(
+                `${SUPABASE_URL}/rest/v1/attendee_profiles?id=in.(${uids})&select=*`,
+                { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
+            );
+            const aProfiles = await apRes.json();
+            if (Array.isArray(aProfiles)) {
+                aProfiles.forEach(p => {
+                    // Only override if not found or to supplement missing data
+                    if (!profileMap[p.id]) {
+                        profileMap[p.id] = p;
+                    }
+                });
+            }
+        }
+
+        // Build summary
+        let pending = 0, approved = 0, rejected = 0, attended = 0;
+        regs.forEach(r => {
+            if (r.status === 'registered')  pending++;
+            else if (r.status === 'approved')  approved++;
+            else if (r.status === 'rejected')  rejected++;
+            else if (r.status === 'attended')  attended++;
+        });
+        const total = regs.length;
+
+        // Render header
+        let html = `
+            <button class="back-btn" onclick="renderEventsList()">← Back to Events</button>
+            <h1 class="page-title" style="margin-bottom:4px;">${escHtml(eventTitle)}</h1>
+            <p class="page-subtitle">Participant requests · ${total} total</p>
+
+            <div class="summary-strip">
+                <div class="summary-box">
+                    <div class="s-val" id="sum-total">${total}</div>
+                    <div class="s-lbl">Total</div>
+                </div>
+                <div class="summary-box pending">
+                    <div class="s-val" id="sum-pending">${pending}</div>
+                    <div class="s-lbl">Pending</div>
+                </div>
+                <div class="summary-box accepted">
+                    <div class="s-val" id="sum-approved">${approved}</div>
+                    <div class="s-lbl">Accepted</div>
+                </div>
+                <div class="summary-box rejected">
+                    <div class="s-val" id="sum-rejected">${rejected}</div>
+                    <div class="s-lbl">Rejected</div>
+                </div>
+            </div>
+            <div id="participant-list">`;
+
+        if (regs.length === 0) {
+            html += `<div class="empty-state">
+                <div class="es-icon">👤</div>
+                <div class="es-title">No requests yet</div>
+                <p>Nobody has sent a join request to this event yet.</p>
+            </div>`;
+        } else {
+            regs.forEach(r => {
+                const p = profileMap[r.attendee_id] || {};
+                const name = p.full_name || 'Unknown User';
+                const sub  = [p.institution, p.area_city].filter(Boolean).join(' · ') || (p.email || '');
+                const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const { chipClass, label } = statusDisplay(r.status);
+
+                const isPending  = r.status === 'registered';
+                const isRejected = r.status === 'rejected';
+                const isApproved = r.status === 'approved' || r.status === 'attended';
+                html += `
+                <div class="participant-card" id="card-${r.id}">
+                    <div class="p-card-top" style="cursor: pointer;" onclick="openParticipantModal('${r.id}', '${r.attendee_id}', '${r.status}', '${eventId}')">
+                        <div class="p-avatar">${initials}</div>
+                        <div class="p-info">
+                            <div class="p-name">${escHtml(name)}</div>
+                            <div class="p-sub">${escHtml(sub)}</div>
+                        </div>
+                        <span class="p-status-chip ${chipClass}" id="chip-${r.id}">${label}</span>
+                    </div>
+                </div>`;
+            });
+        }
+
+        html += `</div>`; // close participant-list
+        container.innerHTML = html;
+    }
+
+    // ────────────────────────────────
+    //  ACCEPT / REJECT ACTION
+    // ────────────────────────────────
+    async function handleAction(regId, eventId, newStatus, btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳';
+
+        const { error } = await sb
+            .from('event_registrations')
+            .update({ status: newStatus })
+            .eq('id', regId);
+
+        if (error) {
+            alert('Error updating status: ' + error.message);
+            btn.disabled = false;
+            btn.textContent = newStatus === 'approved' ? '✅ Accept' : '❌ Reject';
+            return;
+        }
+
+        // Update chip
+        const chip = document.getElementById(`chip-${regId}`);
+        const { chipClass, label } = statusDisplay(newStatus);
+        chip.className = `p-status-chip ${chipClass}`;
+        chip.textContent = label;
+
+        // Disable both buttons for this card
+        document.getElementById(`btn-accept-${regId}`).disabled = true;
+        document.getElementById(`btn-reject-${regId}`).disabled = true;
+        document.getElementById(`btn-accept-${regId}`).textContent = '✅ Accept';
+        document.getElementById(`btn-reject-${regId}`).textContent = '❌ Reject';
+
+        // Update summary counts live
+        updateSummaryCounts(newStatus);
+    }
+
+    // ── Update the summary strip after each action ──
+    function updateSummaryCounts(newStatus) {
+        const pEl = document.getElementById('sum-pending');
+        const aEl = document.getElementById('sum-approved');
+        const rEl = document.getElementById('sum-rejected');
+
+        let pending  = parseInt(pEl.textContent)  || 0;
+        let approved = parseInt(aEl.textContent)  || 0;
+        let rejected = parseInt(rEl.textContent)  || 0;
+
+        // Every action was previously 'registered' (pending)
+        pending = Math.max(0, pending - 1);
+
+        if (newStatus === 'approved') approved++;
+        else if (newStatus === 'rejected') rejected++;
+
+        pEl.textContent = pending;
+        aEl.textContent = approved;
+        rEl.textContent = rejected;
+    }
+
+    // ────────────────────────────────
+    //  HELPERS
+    // ────────────────────────────────
+    function computeStatus(ev) {
+        if ((ev.status || '').toLowerCase() === 'cancelled') return 'cancelled';
+        const now = new Date();
+        let startDt = null, endDt = null;
+        if (ev.start_date) {
+            const t = ev.start_time ? ev.start_time.substring(0, 5) : '00:00';
+            startDt = new Date(`${ev.start_date}T${t}:00`);
+        }
+        if (ev.end_date) {
+            const t = ev.end_time ? ev.end_time.substring(0, 5) : '23:59';
+            endDt = new Date(`${ev.end_date}T${t}:00`);
+        }
+        if (!startDt) return (ev.status || 'upcoming').toLowerCase();
+        if (now < startDt) return 'upcoming';
+        if (endDt && now > endDt) return 'completed';
+        return 'ongoing';
+    }
+
+    function statusDisplay(status) {
+        const map = {
+            registered: { chipClass: 's-pending',  label: 'Pending'   },
+            approved:   { chipClass: 's-approved',  label: 'Accepted'  },
+            rejected:   { chipClass: 's-rejected',  label: 'Rejected'  },
+            attended:   { chipClass: 's-attended',  label: 'Attended'  },
+        };
+        return map[status] || { chipClass: 's-pending', label: status };
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    main();
+</script>
+<!-- ── Participant Details Modal ── -->
+<div class="modal-overlay" id="participantModal">
+    <div class="p-modal">
+        <button class="p-modal-close" onclick="closeParticipantModal()">×</button>
+        <div class="p-modal-header">
+            <div class="p-modal-avatar" id="pm-avatar">U</div>
+            <div>
+                <div class="p-modal-name" id="pm-name">Unknown User</div>
+                <div class="p-modal-email" id="pm-email">no email</div>
+            </div>
+        </div>
+        
+        <div class="p-detail-item">
+            <div class="p-detail-label">Institution / Company</div>
+            <div class="p-detail-val" id="pm-institution">-</div>
+        </div>
+        <div class="p-detail-item">
+            <div class="p-detail-label">Area / City</div>
+            <div class="p-detail-val" id="pm-area">-</div>
+        </div>
+        <div class="p-detail-item">
+            <div class="p-detail-label">Role</div>
+            <div class="p-detail-val" id="pm-role">-</div>
+        </div>
+        <div class="p-detail-item">
+            <div class="p-detail-label">Current Status</div>
+            <div class="p-detail-val" id="pm-status">-</div>
+        </div>
+
+        <div class="p-modal-actions" id="pm-actions">
+            <!-- Buttons dynamically injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    let profileMap = {};
+    
+    function openParticipantModal(regId, attendeeId, status, eventId) {
+        const p = profileMap[attendeeId] || {};
+        const name = p.full_name || 'Unknown User';
+        const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        
+        document.getElementById('pm-avatar').textContent = initials;
+        document.getElementById('pm-name').textContent = name;
+        document.getElementById('pm-email').textContent = p.email || 'No email provided';
+        document.getElementById('pm-institution').textContent = p.institution || '-';
+        document.getElementById('pm-area').textContent = p.area_city || '-';
+        document.getElementById('pm-role').textContent = p.role || '-';
+        
+        const statusMap = { 'registered': 'Pending', 'approved': 'Approved', 'rejected': 'Rejected', 'attended': 'Attended' };
+        document.getElementById('pm-status').textContent = statusMap[status] || status;
+
+        const isApproved = status === 'approved' || status === 'attended';
+        const isRejected = status === 'rejected';
+
+        document.getElementById('pm-actions').innerHTML = `
+            <button class="btn-accept" 
+                ${isApproved ? 'disabled' : ''}
+                onclick="handleActionModal('${regId}', '${eventId}', 'approved', this)">
+                ✅ Accept
+            </button>
+            <button class="btn-reject"
+                ${isRejected || isApproved ? 'disabled' : ''}
+                onclick="handleActionModal('${regId}', '${eventId}', 'rejected', this)">
+                ❌ Reject
+            </button>
+        `;
+
+        document.getElementById('participantModal').classList.add('active');
+    }
+
+    function closeParticipantModal() {
+        document.getElementById('participantModal').classList.remove('active');
+    }
+
+    async function handleActionModal(regId, eventId, newStatus, btn) {
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '...';
+
+        // SECURITY WARNING: Using service_role key in frontend is insecure for production.
+        // We use it here to bypass RLS policies so the organizer can update the status.
+        const SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzM4MzIwNiwiZXhwIjoyMTAyOTU5MjA2fQ.lDo2iSLKm5JArfFwSYKX__3740_sxQHE2m7uCv57_nU';
+        
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/event_registrations?id=eq.${regId}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SERVICE_ROLE,
+                    'Authorization': 'Bearer ' + SERVICE_ROLE,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Failed to update');
+            }
+            
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                throw new Error('Update returned no data.');
+            }
+
+        } catch (error) {
+            alert('Error updating status: ' + error.message);
+            btn.disabled = false;
+            btn.textContent = oldText;
+            return;
+        }
+
+        closeParticipantModal();
+        
+        // Re-render the detail view to update everything
+        const currentTitle = document.querySelector('.page-title').innerText;
+        renderEventDetail(eventId, currentTitle);
+    }
+
+    // Global Sidebar and Menu logic injected by update script
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>
+

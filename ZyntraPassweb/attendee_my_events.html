@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - My Events</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge-notif {
+            position: absolute; top: -2px; right: -4px; background: #ef4444;
+            color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .avatar {
+            width: 40px; height: 40px; background: #0F172A; color: #ffffff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+
+        /* ── Page Header ── */
+        .page-header { background: #f7f9fc; padding: 24px 16px 16px 16px; }
+        .title { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .subtitle { font-size: 15px; color: #475569; line-height: 1.4; margin-bottom: 24px; }
+        .btn-find-more {
+            background: white; border: 1px solid #e2e8f0; padding: 12px 20px; border-radius: 12px;
+            font-weight: 700; color: #0f172a; cursor: pointer; text-decoration: none; display: inline-block;
+        }
+
+        /* ── Tabs ── */
+        .tabs-container {
+            display: flex; gap: 24px; border-bottom: 1px solid #e2e8f0;
+            padding: 0 16px; background: #f7f9fc; position: sticky; top: 76px; z-index: 99; overflow-x: auto;
+        }
+        .tab {
+            padding: 12px 0; font-size: 15px; font-weight: 700; color: #475569;
+            cursor: pointer; position: relative; display: flex; align-items: center; gap: 8px;
+        }
+        .tab.active { color: #3b35a8; }
+        .tab.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+            height: 2px; background: #3b35a8;
+        }
+        .tab-badge {
+            background: #e0e7ff; color: #3b35a8; font-size: 11px; padding: 2px 8px; border-radius: 12px;
+        }
+
+        /* ── Container ── */
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+        
+        .event-card {
+            background: white; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #e2e8f0;
+        }
+        .card-body { padding: 16px; }
+        .event-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .event-details { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
+        
+        /* ── Bottom Nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #475569;
+            font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; gap: 6px;
+        }
+        .nav-item.active { color: #3b35a8; }
+        .nav-icon { font-size: 22px; }
+        
+        /* Sidebar layout matching other pages */
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; }
+        .sidebar { position: fixed; top: 0; bottom: 0; left: -280px; width: 280px; background: white; z-index: 201; transition: 0.3s; padding: 24px; display: flex; flex-direction: column; }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay.active { display: block; }
+        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+        .sidebar-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #5b54e3, #8e8af5); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .sidebar-brand { font-size: 18px; font-weight: 800; color: #0f172a; }
+        .sidebar-subbrand { font-size: 12px; color: #64748b; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #475569; text-decoration: none; font-weight: 600; font-size: 15px; }
+        .sidebar-item.active { background: #f1f5f9; color: #0f172a; }
+        .sidebar-item:hover { background: #f8fafc; }
+        .sidebar-footer { border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; align-items: center; gap: 12px; }
+        .sidebar-user-name { font-size: 14px; font-weight: 700; color: #0f172a; }
+        .sidebar-user-email { font-size: 12px; color: #64748b; }
+        .btn-logout { background: none; border: none; font-size: 18px; color: #64748b; cursor: pointer; margin-left: auto; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo-icon">✨</div>
+        <div>
+            <p class="sidebar-brand">ZyntraPass</p>
+            <p class="sidebar-subbrand">Attendee workspace</p>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+            <a href="attendee_dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+            <a href="attendee_discover.html" class="sidebar-item"><span>🔍</span> Discover</a>
+            <a href="attendee_my_events.html" class="sidebar-item active"><span>📅</span> My Events</a>
+            <a href="attendee_attendance.html" class="sidebar-item"><span>📡</span> Attendance</a>
+            <a href="attendee_certificates.html" class="sidebar-item"><span>📜</span> Certificates</a>
+            <a href="attendee_settings.html" class="sidebar-item"><span>⚙️</span> Settings</a>
+        </div>
+    <div class="sidebar-footer">
+        <div class="avatar" id="sidebar-avatar">--</div>
+        <div class="sidebar-user-info">
+            <p class="sidebar-user-name" id="sidebar-name">Loading...</p>
+            <p class="sidebar-user-email" id="sidebar-email">...</p>
+        </div>
+        <button class="btn-logout" id="sidebar-logout">🚪</button>
+    </div>
+</div>
+
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn">☰</button>
+    </div>
+
+<div class="page-header">
+    <h1 class="title">My events</h1>
+    <p class="subtitle">Everything you've registered for, with live attendance and certificate status.</p>
+    <a href="attendee_discover.html" class="btn-find-more">Find more events</a>
+</div>
+
+<div class="tabs-container">
+    <div class="tab active" data-tab="upcoming">Upcoming <span class="tab-badge" id="countUpcoming">0</span></div>
+    <div class="tab" data-tab="ongoing">Ongoing <span class="tab-badge" id="countOngoing">0</span></div>
+    <div class="tab" data-tab="completed">Completed <span class="tab-badge" id="countCompleted">0</span></div>
+</div>
+
+<div class="container" id="eventsContainer">
+    <!-- Events will be populated here -->
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+    <a href="attendee_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a href="attendee_discover.html" class="nav-item">
+        <span class="nav-icon">🔍</span><span>Discover</span>
+    </a>
+    <a href="attendee_my_events.html" class="nav-item active">
+        <span class="nav-icon">📅</span><span>Events</span>
+    </a>
+    <a href="attendee_attendance.html" class="nav-item">
+        <span class="nav-icon">📡</span><span>Attendance</span>
+    </a>
+    <a href="attendee_certificates.html" class="nav-item">
+        <span class="nav-icon">📜</span><span>Certs</span>
+    </a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+    let sb, currentUserId, currentUserEmail;
+    let allEvents = { upcoming: [], ongoing: [], completed: [] };
+
+    async function main() {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+
+        currentUserId = session.user.id;
+        currentUserEmail = session.user.email;
+        document.getElementById('sidebar-email').textContent = currentUserEmail;
+
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        document.getElementById('menuBtn').addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+        document.getElementById('sidebar-logout').addEventListener('click', async () => {
+            await sb.auth.signOut();
+            window.location.href = 'index.html';
+        });
+
+        await loadAvatar();
+        await loadMyEvents();
+        
+        document.querySelectorAll('.tab').forEach(t => {
+            t.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab').forEach(tb => tb.classList.remove('active'));
+                t.classList.add('active');
+                renderEvents(t.getAttribute('data-tab'));
+            });
+        });
+    }
+
+    async function loadAvatar() {
+        let profile = null;
+        const { data: attProfile } = await sb.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+        if (attProfile) {
+            profile = attProfile;
+        } else {
+            const { data: genProfile } = await sb.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+            profile = genProfile;
+        }
+
+        if (profile && profile.full_name) {
+            const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            (document.getElementById('userAvatar') || {}).textContent = initials;
+            document.getElementById('sidebar-avatar').textContent = initials;
+            document.getElementById('sidebar-name').textContent = profile.full_name;
+        }
+    }
+
+    async function loadMyEvents() {
+        // Fetch ALL user registrations (registered, approved, attended)
+        const { data: regs, error } = await sb.from('event_registrations')
+                                            .select('event_id, status')
+                                            .eq('attendee_id', currentUserId)
+                                            .in('status', ['registered', 'approved', 'attended', 'cancelled']);
+        
+        if (error || !regs || regs.length === 0) {
+            renderEvents('upcoming');
+            return;
+        }
+
+        // Build a map of event_id -> registration status
+        const regStatusMap = {};
+        regs.forEach(r => regStatusMap[r.event_id] = r.status);
+        
+        const eventIds = regs.map(r => r.event_id);
+        
+        const { data: events, error: evError } = await sb.from('events')
+                                                .select('*')
+                                                .in('id', eventIds);
+                                                
+        if (evError || !events) return;
+        
+        // Reset
+        allEvents = { upcoming: [], ongoing: [], completed: [] };
+        
+        const now = new Date();
+        
+        events.forEach(ev => {
+            // Attach registration status to event object
+            ev._regStatus = regStatusMap[ev.id] || 'registered';
+            
+            // Parse dates properly combining date and time
+            let startStr = ev.start_date ? ev.start_date + 'T' + (ev.start_time || '00:00:00') : null;
+            let endStr = ev.end_date ? ev.end_date + 'T' + (ev.end_time || '23:59:59') : null;
+            let start = startStr ? new Date(startStr) : null;
+            let end = endStr ? new Date(endStr) : null;
+            
+            // Fallback
+            if (!start || isNaN(start.getTime())) {
+                allEvents.upcoming.push(ev);
+                return;
+            }
+            if (!end || isNaN(end.getTime())) {
+                end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+            }
+
+            if (now < start) {
+                allEvents.upcoming.push(ev);
+            } else if (now >= start && now <= end) {
+                allEvents.ongoing.push(ev);
+            } else {
+                allEvents.completed.push(ev);
+            }
+        });
+        
+        document.getElementById('countUpcoming').textContent = allEvents.upcoming.length;
+        document.getElementById('countOngoing').textContent = allEvents.ongoing.length;
+        document.getElementById('countCompleted').textContent = allEvents.completed.length;
+        
+        // Auto-select the tab that has events
+        const activeTab = allEvents.ongoing.length > 0 ? 'ongoing' :
+                          allEvents.upcoming.length > 0 ? 'upcoming' : 'completed';
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.toggle('active', t.getAttribute('data-tab') === activeTab);
+        });
+        renderEvents(activeTab);
+    }
+
+    function renderEvents(category) {
+        const container = document.getElementById('eventsContainer');
+        container.innerHTML = '';
+        
+        const eventsToShow = allEvents[category];
+        
+        if (eventsToShow.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color:#64748b; padding: 40px;">No ${category} events found.</p>`;
+            return;
+        }
+        
+        eventsToShow.forEach(ev => {
+            const regStatus = ev._regStatus || 'registered';
+            const statusColor = regStatus === 'approved' ? '#10b981' : regStatus === 'attended' ? '#6366f1' : regStatus === 'cancelled' ? '#ef4444' : '#f59e0b';
+            const statusLabel = regStatus === 'approved' ? '✅ Approved' : regStatus === 'attended' ? '🏅 Attended' : regStatus === 'cancelled' ? '❌ Cancelled' : '⏳ Pending Approval';
+
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="card-body">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <h2 class="event-title" style="margin:0;">${ev.title}</h2>
+                        <span style="font-size:11px; font-weight:700; color:${statusColor}; background:${statusColor}22; padding:4px 10px; border-radius:20px; white-space:nowrap; margin-left:8px;">${statusLabel}</span>
+                    </div>
+                    <div class="event-details">
+                        <div class="detail-item">📅 ${ev.start_date || 'TBA'} ${ev.end_date && ev.end_date !== ev.start_date ? 'to ' + ev.end_date : ''}</div>
+                        <div class="detail-item">🕒 ${ev.start_time || 'TBA'} ${ev.end_time ? '- ' + ev.end_time : ''}</div>
+                        <div class="detail-item">📍 ${ev.venue_name || 'Online'}</div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <button style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; background: white; border-radius: 12px; font-weight: 700; color: #0f172a; cursor: pointer;" onclick="window.location.href='attendee_event_detail.html?id=${ev.id}'">View Event</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    main();
+</script>
+</body>
+</html>
+

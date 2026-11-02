@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/bg_gradient">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Sign in to continue"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Choose how you'll use ZyntraPass today."
+            android:textColor="#A8B2D1"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvRoleLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I am signing in as"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Role Options -->
+        <Button
+            android:id="@+id/btnRoleAttendee"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:text="Attendee"
+            android:background="@drawable/bg_outlined_button"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:layout_marginTop="16dp"
+            app:backgroundTint="@null"
+            app:layout_constraintTop_toBottomOf="@id/tvRoleLabel" />
+
+        <Button
+            android:id="@+id/btnRoleOrganizer"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:text="Organizer"
+            android:background="@drawable/bg_outlined_button"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:layout_marginTop="16dp"
+            app:backgroundTint="@null"
+            app:layout_constraintTop_toBottomOf="@id/btnRoleAttendee" />
+
+        <Button
+            android:id="@+id/btnRoleVolunteer"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:text="Volunteer"
+            android:background="@drawable/bg_outlined_button"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:layout_marginTop="16dp"
+            app:backgroundTint="@null"
+            app:layout_constraintTop_toBottomOf="@id/btnRoleOrganizer" />
+
+        <!-- Login Form -->
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Email"
+            android:textColorHint="#A8B2D1"
+            android:textColor="#FFFFFF"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/bg_outlined_button"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/btnRoleVolunteer" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Password"
+            android:textColorHint="#A8B2D1"
+            android:textColor="#FFFFFF"
+            android:inputType="textPassword"
+            android:background="@drawable/bg_outlined_button"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/etEmail" />
+
+        <!-- Secret Key (Hidden by default) -->
+        <EditText
+            android:id="@+id/etSecretKey"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Secret Key (2FA)"
+            android:textColorHint="#A8B2D1"
+            android:textColor="#FFFFFF"
+            android:inputType="textPassword"
+            android:background="@drawable/bg_outlined_button"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/etPassword" />
+
+        <EditText
+            android:id="@+id/etVolunteerCode"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Volunteer Code"
+            android:textColorHint="#A8B2D1"
+            android:textColor="#FFFFFF"
+            android:inputType="text"
+            android:background="@drawable/bg_outlined_button"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="32dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/etSecretKey" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Login"
+            android:background="@drawable/bg_primary_button"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            app:backgroundTint="@null"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@id/etVolunteerCode" />
+
+        <TextView
+            android:id="@+id/tvCreateAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New to ZyntraPass? Create Account"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintTop_toBottomOf="@id/btnLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+

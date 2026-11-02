@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ZyntraPass</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { 
+            background-color: #0d162a; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 40px auto;
+            background-color: white;
+            color: #0d162a;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .auth-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; color: #0d162a; }
+        .auth-subtitle { color: #4a5568; font-size: 15px; margin-bottom: 24px; }
+        
+        .role-label { font-size: 14px; font-weight: 700; color: #0d162a; margin-bottom: 12px; display: block; }
+        
+        .role-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: white;
+        }
+        .role-option:hover {
+            border-color: #5b54e3;
+            background-color: #f8faff;
+        }
+        .role-option.selected {
+            border-color: #5b54e3;
+            background-color: #ebf4ff;
+        }
+        .role-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            font-size: 20px;
+            color: #4a5568;
+        }
+        .role-option.selected .role-icon {
+            background-color: #5b54e3;
+            color: white;
+        }
+        .role-text h4 { margin: 0; font-size: 16px; font-weight: 700; color: #0d162a; }
+        .role-text p { margin: 4px 0 0 0; font-size: 13px; color: #718096; }
+
+        .form-group { margin-top: 24px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; color: #0d162a; font-size: 14px; font-weight: 700; }
+        .form-group input {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1;
+            background-color: white; color: #0d162a; font-size: 16px;
+        }
+        .form-group input:focus { outline: none; border-color: #5b54e3; box-shadow: 0 0 0 2px rgba(91, 84, 227, 0.2); }
+        
+        .secret-key-container {
+            display: none; /* Hidden by default, shown when Organizer is selected */
+        }
+        
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .remember-me { display: flex; align-items: center; color: #4a5568; cursor: pointer; }
+        .remember-me input { margin-right: 8px; width: 16px; height: 16px; cursor: pointer; }
+        .forgot-pw { color: #5b54e3; font-weight: 600; text-decoration: none; }
+
+        .btn-submit {
+            background-color: #5b54e3; color: white; width: 100%; padding: 16px;
+            border-radius: 12px; font-weight: bold; font-size: 16px; border: none;
+            cursor: pointer; margin-top: 24px;
+        }
+        .error-msg { color: #e53e3e; font-size: 14px; margin-top: 16px; display: none; text-align: center; }
+        
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 class="auth-title">Sign in to continue</h2>
+        <p class="auth-subtitle">Choose how you'll use ZyntraPass today.</p>
+        
+        <span class="role-label">I am signing in as</span>
+
+        <!-- Role Selection -->
+        <div class="role-option" data-role="attendee" id="role-attendee">
+            <div class="role-icon">🧭</div>
+            <div class="role-text">
+                <h4>Attendee</h4>
+                <p>Discover and attend events</p>
+            </div>
+        </div>
+
+        <div class="role-option" data-role="organizer" id="role-organizer">
+            <div class="role-icon">📅</div>
+            <div class="role-text">
+                <h4>Organizer</h4>
+                <p>Create and manage events</p>
+            </div>
+        </div>
+
+        <div class="role-option" data-role="volunteer" id="role-volunteer">
+            <div class="role-icon">🛂</div>
+            <div class="role-text">
+                <h4>Volunteer</h4>
+                <p>Verify attendance and manage participants</p>
+            </div>
+        </div>
+
+        <div class="error-msg" id="error-msg"></div>
+
+        <form id="login-form">
+            <input type="hidden" id="selectedRole" value="">
+
+            <div class="form-group" id="emailGroup">
+                <label>Email</label>
+                <input type="email" id="email" required placeholder="aarav.sharma@nitk.edu.in">
+            </div>
+            
+            <div class="form-group" id="passwordGroup">
+                <label>Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+
+            <!-- Secret Key Field (Only for Organizers) -->
+            <div class="form-group secret-key-container" id="secretKeyGroup">
+                <label>Organizer Secret Key (2FA)</label>
+                <input type="password" id="secretKey" placeholder="Enter Secret Key">
+            </div>
+
+            <!-- Volunteer Code Field (Only for Volunteers) -->
+            <div class="form-group secret-key-container" id="volunteerCodeGroup">
+                <label>Volunteer Code</label>
+                <input type="text" id="volunteerCode" placeholder="Enter 4-digit code">
+            </div>
+
+            <div class="flex-row" id="rememberForgotGroup">
+                <label class="remember-me">
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="#" class="forgot-pw">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">Login</button>
+        </form>
+
+        <p style="margin-top: 32px; font-size: 15px; color: #4a5568; text-align: center;">
+            New to ZyntraPass? <a href="#" id="create-account-link" style="color: #5b54e3; font-weight: bold; text-decoration: none;">Create Account</a>
+        </p>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="login.js"></script>
+</body>
+</html>

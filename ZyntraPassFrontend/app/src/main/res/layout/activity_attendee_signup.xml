@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainAttendeeSignup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0D162A">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_white_button"
+            android:padding="32dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Create your attendee account"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#0F172A"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="One account works across every organisation and every event, forever."
+                android:textColor="#475569"
+                android:textSize="14sp"
+                android:layout_marginBottom="32dp" />
+
+            
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Full Name" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etFullName" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="Aarav Sharma" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Email" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etEmail" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:inputType="textEmailAddress" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="you@college.edu" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone Number" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etPhone" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:inputType="phone" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="+91 98860 45120" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Password" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etPassword" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:inputType="textPassword" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:layout_marginBottom="4dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Use 8+ characters with a number and a symbol." android:textColor="#64748B" android:textSize="12sp" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Confirm Password" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etConfirmPassword" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:inputType="textPassword" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Institution / College / Company" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etInstitution" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="NIT Surathkal" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Area / City" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etCity" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="Mangaluru" android:layout_marginBottom="16dp" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Native Place" android:textColor="#0F172A" android:textStyle="bold" android:textSize="13sp" android:layout_marginBottom="8dp" />
+            <EditText android:id="@+id/etNative" android:layout_width="match_parent" android:layout_height="50dp" android:background="@drawable/bg_outlined_button" android:paddingHorizontal="16dp" android:textColor="#0F172A" android:textSize="15sp" android:hint="Udupi, Karnataka" android:layout_marginBottom="24dp" />
+
+            <Button
+                android:id="@+id/btnSubmitSignup"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Create account"
+                android:textAllCaps="false"
+                android:backgroundTint="#5B54E3"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Already have an account? " android:textColor="#475569" android:textSize="14sp" />
+                <TextView android:id="@+id/tvSignIn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sign in" android:textColor="#3B35A8" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

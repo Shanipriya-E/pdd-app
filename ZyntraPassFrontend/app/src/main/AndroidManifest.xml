@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ZyntraPass">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".OrganizerSignupActivity" />
+        <activity android:name=".RoleSelectionActivity" />
+        <activity android:name=".OrganizerDashboardActivity" />
+        <activity android:name=".CreateEventActivity" />
+        <activity android:name=".EventsActivity" />
+        <activity android:name=".ParticipantsActivity" />
+        <activity android:name=".ParticipantDetailActivity" />
+        <activity android:name=".VolunteersActivity" />
+        <activity android:name=".AttendeeSignupActivity" />
+        <activity android:name=".AttendeeDashboardActivity" />
+        <activity android:name=".AttendeeDiscoverActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".LiveAttendanceActivity" />
+        <activity android:name=".VolunteerDashboardActivity" android:exported="false" />
+        <activity android:name=".VolunteerParticipantsActivity" android:exported="false" />
+        <activity android:name=".VolunteerScanActivity" android:exported="false" />
+        <activity android:name=".CertificatesActivity" android:exported="false" />
+        <activity android:name=".AttendeeCertificatesActivity" android:exported="false" />
+    
+        <activity android:name=".AttendeeEventsActivity" android:exported="false" />
+        <activity android:name=".AttendeeAttendanceActivity" android:exported="false" />
+    
+        <activity android:name=".EventDetailActivity" android:exported="false" />
+    </application>
+
+</manifest>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Discover</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge-notif {
+            position: absolute; top: -2px; right: -4px; background: #ef4444;
+            color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .avatar {
+            width: 40px; height: 40px; background: #0F172A; color: #ffffff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+
+        /* ── Header ── */
+        .page-header { background: white; padding: 0 16px 16px 16px; }
+        .title { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .subtitle { font-size: 15px; color: #475569; line-height: 1.4; margin-bottom: 16px; }
+
+        .search-controls { display: flex; gap: 12px; margin-bottom: 8px; flex-direction: column; }
+        .btn-filters {
+            background: white; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 12px;
+            font-weight: 600; color: #0f172a; cursor: pointer; align-self: flex-start;
+        }
+        .search-box {
+            position: relative; width: 100%;
+        }
+        .search-box input {
+            width: 100%; padding: 14px 16px 14px 44px; border: 1px solid #e2e8f0;
+            border-radius: 12px; font-size: 15px; color: #0f172a;
+        }
+        .search-box span {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px;
+        }
+
+        /* ── Container ── */
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+        /* ── Event Cards ── */
+        .event-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px;
+        }
+        .card-image-wrap {
+            position: relative; width: 100%; height: 180px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+        .card-badges { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; }
+        .badge-group { display: flex; gap: 8px; }
+        .badge { background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); }
+        .badge.highlight { background: #5b54e3; border: none; }
+        .card-location { position: absolute; bottom: 12px; left: 16px; color: white; font-size: 13px; font-weight: 600; }
+
+        .card-body { padding: 20px; }
+        .event-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .event-org { font-size: 14px; color: #3b35a8; margin-bottom: 16px; }
+
+        .event-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
+        
+        .event-tags { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tag { background: #f1f5f9; color: #0f172a; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 8px; }
+
+        .card-actions { display: flex; gap: 12px; }
+        .btn-view { flex: 1; padding: 12px; border: 1px solid #e2e8f0; background: white; border-radius: 12px; font-weight: 700; color: #0f172a; cursor: pointer; }
+        .btn-register { flex: 1; padding: 12px; border: none; background: #5b54e3; border-radius: 12px; font-weight: 700; color: white; cursor: pointer; }
+        .btn-register:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        /* ── Bottom Nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #475569;
+            font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; gap: 6px;
+        }
+        .nav-item.active { color: #3b35a8; }
+        .nav-icon { font-size: 22px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn">☰</button>
+    </div>
+
+<div class="page-header">
+    <h1 class="title">Discover events</h1>
+    <p class="subtitle">Summits, bootcamps, workshops, competitions and cultural fests across every organisation.</p>
+    
+    <div class="search-controls">
+        <button class="btn-filters">⧎ Filters</button>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search events, topics, organizers..." id="searchInput">
+        </div>
+    </div>
+</div>
+
+<div class="container" id="eventsContainer">
+    <!-- Events will be populated here -->
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+    <a href="attendee_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a href="attendee_discover.html" class="nav-item active">
+        <span class="nav-icon">🔍</span><span>Discover</span>
+    </a>
+    <a href="attendee_my_events.html" class="nav-item">
+        <span class="nav-icon">📅</span><span>Events</span>
+    </a>
+    <a href="attendee_attendance.html" class="nav-item">
+        <span class="nav-icon">📡</span><span>Attendance</span>
+    </a>
+    <a href="attendee_attendance.html" class="nav-item">
+        <span class="nav-icon">📡</span><span>Attendance</span>
+    </a>
+    <a href="attendee_certificates.html" class="nav-item">
+        <span class="nav-icon">📜</span><span>Certs</span>
+    </a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+    let sb, currentUserId;
+    let profilesMap = {};
+    let registrationsMap = {}; // event_id -> status
+    let volunteerMap = {}; // event_id -> status
+
+    async function main() {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+        currentUserId = session.user.id;
+        
+        await loadAvatar();
+        await loadEvents();
+    }
+
+    async function loadAvatar() {
+        const { data: attProfile } = await sb.from('profiles').select('full_name').eq('id', currentUserId).maybeSingle();
+        const { data: genProfile } = await sb.from('profiles').select('full_name').eq('id', currentUserId).maybeSingle();
+        const profile = attProfile || genProfile;
+
+        if (profile && profile.full_name) {
+            const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            (document.getElementById('userAvatar') || {}).textContent = initials;
+        }
+    }
+
+    async function loadEvents() {
+        // Fetch all events
+        const { data: events, error } = await sb.from('events').select('*').order('created_at', { ascending: false });
+        if (error || !events) return;
+
+        // Fetch organizer profiles for these events
+        const orgIds = [...new Set(events.map(e => e.organizer_id))];
+        if (orgIds.length > 0) {
+            const { data: orgProfiles } = await sb.from('profiles').select('id, full_name, institution').in('id', orgIds);
+            if (orgProfiles) {
+                orgProfiles.forEach(p => { profilesMap[p.id] = p; });
+            }
+        }
+
+        // Fetch user registrations to check if already registered
+        const { data: regs } = await sb.from('event_registrations').select('event_id, status').eq('attendee_id', currentUserId);
+        if (regs) {
+            regs.forEach(r => { registrationsMap[r.event_id] = r.status; });
+        }
+
+        // Fetch user volunteer requests
+        const { data: volReqs } = await sb.from('volunteers').select('event_id, status, secret_code').eq('user_id', currentUserId);
+        if (volReqs) {
+            volReqs.forEach(r => { volunteerMap[r.event_id] = { status: r.status, code: r.secret_code }; });
+        }
+
+        renderEvents(events);
+    }
+
+    function renderEvents(events) {
+        const container = document.getElementById('eventsContainer');
+        container.innerHTML = '';
+
+        if (events.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#64748b; padding: 40px;">No events found.</p>';
+            return;
+        }
+
+        events.forEach(ev => {
+            const isRegistered = registrationsMap[ev.id] === 'registered' || registrationsMap[ev.id] === 'approved' || registrationsMap[ev.id] === 'attended';
+            const vol = volunteerMap[ev.id]; // undefined or object with status and code
+            
+            let volBtnText = 'Register as Volunteer';
+            let volBtnStyle = 'background: #f1f5f9; color: #475569;';
+            let volBtnDisabled = false;
+            
+            if (vol && vol.status === 'pending') {
+                volBtnText = 'Volunteer Request Pending';
+                volBtnDisabled = true;
+            } else if (vol && vol.status === 'approved') {
+                volBtnText = `Volunteer Approved (Code: ${vol.code || '----'})`;
+                volBtnDisabled = true;
+                volBtnStyle = 'background: #d1fae5; color: #047857; font-weight: bold;';
+            } else if (vol && vol.status === 'rejected') {
+                volBtnText = 'Volunteer Request Rejected';
+                volBtnDisabled = true;
+                volBtnStyle = 'background: #fee2e2; color: #b91c1c;';
+            }
+
+            const org = profilesMap[ev.organizer_id];
+            const orgName = org ? (org.institution || org.full_name) : "Unknown Organizer";
+            const cat = ev.category || "General";
+            const match = Math.floor(Math.random() * (99 - 60 + 1) + 60);
+            const price = "Free"; 
+
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="card-image-wrap">
+                    <div class="card-badges">
+                        <div class="badge-group">
+                            <span class="badge">${cat}</span>
+                            <span class="badge">${price}</span>
+                        </div>
+                        <span class="badge highlight">${match}% Match</span>
+                    </div>
+                    <div class="card-location">📍 ${ev.venue_name || "Online"}</div>
+                </div>
+                <div class="card-body">
+                    <h2 class="event-title">${ev.title}</h2>
+                    <p class="event-org">${orgName}</p>
+                    
+                    <div class="event-details">
+                        <div class="detail-item">📅 ${ev.start_date || 'TBA'}</div>
+                        <div class="detail-item">🕒 ${ev.start_time || 'TBA'}</div>
+                        <div class="detail-item">👥 Open</div>
+                        <div class="detail-item">📍 ${ev.address || 'Various'}</div>
+                    </div>
+
+                    <div class="event-tags">
+                        <span class="tag">${cat}</span>
+                        <span class="tag">Event</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-view" onclick="window.location.href='attendee_event_detail.html?id=${ev.id}'">View Event</button>
+                        <button class="btn-register" id="btn-reg-${ev.id}">
+                            ${isRegistered ? 'Registered' : 'Register'}
+                        </button>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <button class="btn-view" style="width: 100%; border: none; font-size: 14px; ${volBtnStyle}" id="btn-vol-${ev.id}" ${volBtnDisabled ? 'disabled' : ''}>
+                            ${volBtnText}
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+
+            const regBtn = card.querySelector(`#btn-reg-${ev.id}`);
+            if (isRegistered) {
+                regBtn.disabled = true;
+                regBtn.style.background = '#e2e8f0';
+                regBtn.style.color = '#64748b';
+            } else {
+                regBtn.addEventListener('click', () => handleRegister(ev.id, regBtn));
+            }
+            
+            const volBtn = card.querySelector(`#btn-vol-${ev.id}`);
+            if (!volBtnDisabled) {
+                volBtn.addEventListener('click', () => handleVolunteerRequest(ev.id, volBtn));
+            }
+        });
+    }
+
+    async function handleRegister(eventId, btn) {
+        btn.disabled = true;
+        btn.textContent = 'Registering...';
+
+        try {
+            const { error } = await sb.from('event_registrations').insert([
+                { event_id: eventId, attendee_id: currentUserId, status: 'registered' }
+            ]);
+            
+            if (error) throw error;
+            
+            btn.textContent = 'Registered';
+            btn.style.background = '#e2e8f0';
+            btn.style.color = '#64748b';
+            
+            registrationsMap[eventId] = 'registered';
+        } catch (e) {
+            alert('Error registering: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Register';
+        }
+    }
+
+    async function handleVolunteerRequest(eventId, btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending Request...';
+        
+        try {
+            const { error } = await sb.from('volunteers').insert([
+                { event_id: eventId, user_id: currentUserId, status: 'pending' }
+            ]);
+            
+            if (error) throw error;
+            
+            btn.textContent = 'Volunteer Request Pending';
+            volunteerMap[eventId] = { status: 'pending' };
+        } catch (e) {
+            alert('Error requesting volunteer: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = 'Register as Volunteer';
+        }
+    }
+
+    main();
+</script>
+</body>
+</html>
+

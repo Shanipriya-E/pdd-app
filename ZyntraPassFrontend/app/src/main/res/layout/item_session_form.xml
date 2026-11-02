@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_outlined_button"
+    android:padding="24dp"
+    android:layout_marginBottom="24dp">
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Session name" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etSessionName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Speaker" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etSessionSpeaker"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Start time" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etSessionStart"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:hint="09:15"
+        android:drawableEnd="@android:drawable/ic_menu_recent_history"
+        android:drawableTint="#0D162A"
+        android:focusable="false"
+        android:clickable="true"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="End time" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etSessionEnd"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:hint="10:00"
+        android:drawableEnd="@android:drawable/ic_menu_recent_history"
+        android:drawableTint="#0D162A"
+        android:focusable="false"
+        android:clickable="true"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Room" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etSessionRoom"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:id="@+id/btnRemoveSession"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="end"
+        android:gravity="center_vertical">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🗑" android:textSize="16sp" android:layout_marginEnd="8dp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Remove" android:textColor="#1E293B" android:textStyle="bold" android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,412 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass - Events</title>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 70px; }
+        
+        /* Top App Bar */
+        .top-bar {
+            background-color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px; width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge { position: absolute; top: -2px; right: -4px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .avatar { width: 40px; height: 40px; background: #e0e7ff; color: #5b54e3; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+        
+        /* Header Section */
+        h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        p.subtitle { font-size: 15px; color: #475569; line-height: 1.5; margin-bottom: 24px; }
+        .btn-create {
+            background-color: #5b54e3; color: white; border: none; border-radius: 12px; padding: 14px 24px; font-weight: 600; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 32px;
+        }
+        .btn-create:hover { background-color: #4a44b8; }
+
+        /* Search */
+        .search-container { margin-bottom: 24px; position: relative; }
+        .search-input {
+            width: 100%; padding: 16px 16px 16px 44px; border: 1px solid #e2e8f0; border-radius: 16px; font-size: 15px; outline: none;
+        }
+        .search-icon { position: absolute; left: 16px; top: 16px; color: #64748b; font-size: 18px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            font-size: 15px; font-weight: 600; color: #475569; cursor: pointer; white-space: nowrap; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid transparent;
+        }
+        .tab.active { color: #3b35a8; border-bottom: 2px solid #5b54e3; }
+        .tab-badge {
+            background: #f1f5f9; color: #334155; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 12px;
+        }
+        .tab.active .tab-badge { background: #eef2ff; color: #3b35a8; }
+
+        /* Event Cards */
+        .event-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 24px; cursor: pointer;
+        }
+        .event-banner {
+            width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background: #f1f5f9;
+        }
+        .event-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .tag {
+            font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+        }
+        .tag-status { background: #eef2ff; color: #3b35a8; text-transform: capitalize; }
+        .tag-category { background: #f1f5f9; color: #475569; }
+        .tag-checkpoints { background: #f1f5f9; color: #475569; }
+        
+        .event-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; gap: 4px;
+        }
+        .nav-item.active { color: #3b35a8; }
+        .nav-icon { font-size: 20px; }
+
+        /* Sidebar Drawer */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar-overlay.active { display: block; }
+        .sidebar { position: fixed; top: 0; left: -300px; bottom: 0; width: 300px; background: linear-gradient(180deg, #1A448C 0%, #0D162A 100%); z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; color: white; box-shadow: 4px 0 16px rgba(0,0,0,0.2); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo-icon { width: 40px; height: 40px; background-color: #5B54E3; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .sidebar-brand { font-size: 18px; font-weight: bold; margin: 0; }
+        .sidebar-subbrand { font-size: 12px; color: #A8B2D1; margin: 0; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-item { padding: 12px 24px; display: flex; align-items: center; gap: 16px; color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-footer .avatar { width: 40px; height: 40px; background-color: #3C4260; color: #A8B2D1; font-size: 14px; }
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { margin: 0; font-weight: bold; font-size: 14px; color: white; }
+        .sidebar-user-email { margin: 0; font-size: 11px; color: #A8B2D1; }
+        .sidebar-logout { font-size: 20px; color: #A8B2D1; cursor: pointer; }
+        .sidebar-logout:hover { color: white; }
+
+        #debug-panel { background: #1e293b; color: #94a3b8; font-family: monospace; font-size: 12px; padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo-icon">✨</div>
+            <div>
+                <p class="sidebar-brand">ZyntraPass</p>
+                <p class="sidebar-subbrand">Organizer workspace</p>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+        <a href="events.html" class="sidebar-item active"><span>📅</span> Events</a>
+        <a href="participants.html" class="sidebar-item"><span>👥</span> Participants</a>
+        <a href="live.html" class="sidebar-item"><span>📡</span> Live Attendance</a>
+        <a href="volunteers.html" class="sidebar-item"><span>🤝</span> Volunteers</a>
+        <a href="certificates.html" class="sidebar-item"><span>📜</span> Certificates</a>
+        <a href="settings.html" class="sidebar-item"><span>⚙️</span> Settings</a>
+    </div>
+        <div class="sidebar-footer">
+            <div class="avatar" id="sidebar-avatar">--</div>
+            <div class="sidebar-user-info">
+                <p class="sidebar-user-name" id="sidebar-name">Loading...</p>
+                <p class="sidebar-user-email" id="sidebar-email">...</p>
+            </div>
+            <div class="sidebar-logout" id="sidebar-logout">🚪</div>
+        </div>
+    </div>
+
+    <!-- Top App Bar -->
+    <div class="top-bar">
+        <button class="btn-menu" id="menuBtn">☰</button>
+        </div>
+
+    <div class="container">
+        <h1>Events</h1>
+        <p class="subtitle">Create, configure and monitor every event your organisation runs.</p>
+        
+        <button class="btn-create" onclick="window.location.href='create_event.html'">
+            <span style="font-size: 18px;">+</span> Create event
+        </button>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search your events..." oninput="filterBySearch()">
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-filter="all">All <span class="tab-badge" id="badge-all">0</span></div>
+            <div class="tab" data-filter="upcoming">Upcoming <span class="tab-badge" id="badge-upcoming">0</span></div>
+            <div class="tab" data-filter="ongoing">Ongoing <span class="tab-badge" id="badge-ongoing">0</span></div>
+            <div class="tab" data-filter="completed">Completed <span class="tab-badge" id="badge-completed">0</span></div>
+            <div class="tab" data-filter="cancelled">Cancelled <span class="tab-badge" id="badge-cancelled">0</span></div>
+        </div>
+
+        <div id="debug-panel"></div>
+
+        <div id="events-feed">
+            <p style="text-align: center; color: #64748b; margin-top: 40px;">Loading events...</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">⚏</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="events.html" class="nav-item active">
+            <span class="nav-icon">📅</span>
+            <span>Events</span>
+        </a>
+        <a href="participants.html" class="nav-item">
+            <span class="nav-icon">👥</span>
+            <span>Participants</span>
+        </a>
+        <a href="live.html" class="nav-item">
+            <span class="nav-icon">📡</span>
+            <span>Live</span>
+        </a>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+        let allEvents = [];
+        let currentFilter = 'all';
+        let supabaseClient;
+
+        function debug(msg) {
+            console.log('[DEBUG]', msg);
+        }
+
+        function setFeed(html) {
+            document.getElementById('events-feed').innerHTML = html;
+        }
+
+        async function main() {
+            debug('⏳ Starting...');
+
+            // Init Supabase
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            debug('✅ Supabase client created');
+
+            // Get session
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+            if (sessionError) {
+                debug('❌ Session error: ' + sessionError.message);
+                setFeed('<p style="color:red;text-align:center;padding:20px">Session error: ' + sessionError.message + '</p>');
+                return;
+            }
+            if (!session) {
+                debug('❌ No session found — redirecting to login');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const userId = session.user.id;
+            debug('✅ Session OK. User ID: ' + userId);
+
+            // Set avatar
+            const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', userId).maybeSingle();
+            if (profile && profile.full_name) {
+                const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                (document.getElementById('userAvatar') || {}).textContent = initials;
+                document.getElementById('sidebar-avatar').textContent = initials;
+                document.getElementById('sidebar-name').textContent = profile.full_name;
+            }
+            document.getElementById('sidebar-email').textContent = session.user.email;
+
+            // Sidebar
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            document.getElementById('menuBtn').addEventListener('click', () => {
+                sidebar.classList.add('active'); overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active'); overlay.classList.remove('active');
+            });
+            document.getElementById('sidebar-logout').addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            });
+
+            // Fetch events — use direct REST fetch to bypass any SDK issues
+            debug('⏳ Fetching events for organizer_id = ' + userId);
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/events?organizer_id=eq.${userId}&select=*&order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': 'Bearer ' + session.access_token
+                        }
+                    }
+                );
+                const data = await response.json();
+                debug('📦 Response status: ' + response.status);
+                debug('📦 Events found: ' + (Array.isArray(data) ? data.length : JSON.stringify(data)));
+
+                if (!Array.isArray(data)) {
+                    setFeed('<p style="color:red;text-align:center;padding:20px">API Error: ' + JSON.stringify(data) + '</p>');
+                    return;
+                }
+
+                allEvents = data;
+                updateBadges();
+                renderEvents();
+
+                // Tab switching
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        currentFilter = e.currentTarget.dataset.filter;
+                        renderEvents();
+                    });
+                });
+            } catch (err) {
+                debug('❌ Fetch exception: ' + err.message);
+                setFeed('<p style="color:red;text-align:center;padding:20px">Fetch error: ' + err.message + '</p>');
+            }
+        }
+
+        function computeStatus(ev) {
+            // Cancelled is always manual — respect it
+            if ((ev.status || '').toLowerCase() === 'cancelled') return 'cancelled';
+
+            const now = new Date();
+
+            // Build start datetime
+            let startDt = null;
+            if (ev.start_date) {
+                const t = ev.start_time ? ev.start_time.substring(0, 5) : '00:00';
+                startDt = new Date(`${ev.start_date}T${t}:00`);
+            }
+
+            // Build end datetime
+            let endDt = null;
+            if (ev.end_date) {
+                const t = ev.end_time ? ev.end_time.substring(0, 5) : '23:59';
+                endDt = new Date(`${ev.end_date}T${t}:00`);
+            }
+
+            if (!startDt) return (ev.status || 'upcoming').toLowerCase();
+            if (now < startDt) return 'upcoming';
+            if (endDt && now > endDt) return 'completed';
+            return 'ongoing';
+        }
+
+        function updateBadges() {
+            const counts = { all: allEvents.length, upcoming: 0, ongoing: 0, completed: 0, cancelled: 0 };
+            allEvents.forEach(ev => {
+                const s = computeStatus(ev);
+                if (counts[s] !== undefined) counts[s]++;
+            });
+            document.getElementById('badge-all').textContent = counts.all;
+            document.getElementById('badge-upcoming').textContent = counts.upcoming;
+            document.getElementById('badge-ongoing').textContent = counts.ongoing;
+            document.getElementById('badge-completed').textContent = counts.completed;
+            document.getElementById('badge-cancelled').textContent = counts.cancelled;
+        }
+
+        function renderEvents() {
+            const feed = document.getElementById('events-feed');
+            const filtered = allEvents.filter(ev => {
+                if (currentFilter === 'all') return true;
+                return computeStatus(ev) === currentFilter;
+            });
+
+            if (filtered.length === 0) {
+                feed.innerHTML = '<p style="text-align:center;color:#64748b;margin-top:40px;">No events in this category.</p>';
+                return;
+            }
+
+            feed.innerHTML = '';
+            filtered.forEach(ev => {
+                const status = computeStatus(ev);
+                const bannerUrl = ev.banner_image_url || '';
+                const title = ev.title || 'Untitled event';
+                const category = ev.category || 'Event';
+                const checkpoints = (ev.checkpoints_count || 0) + ' checkpoints';
+
+                // Status tag color
+                const statusColors = {
+                    upcoming:  'background:#eef2ff;color:#3b35a8',
+                    ongoing:   'background:#dcfce7;color:#166534',
+                    completed: 'background:#f1f5f9;color:#475569',
+                    cancelled: 'background:#fee2e2;color:#991b1b'
+                };
+                const statusStyle = statusColors[status] || statusColors.upcoming;
+
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.style.cursor = 'pointer';
+                card.onclick = () => window.location.href = `event_detail.html?id=${ev.id}`;
+                card.innerHTML = `
+                    ${bannerUrl ? `<img src="${bannerUrl}" alt="Banner" class="event-banner" onerror="this.style.display='none'">` : '<div class="event-banner" style="background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:14px;">No image</div>'}
+                    <div class="event-tags">
+                        <span class="tag" style="${statusStyle};border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;text-transform:capitalize;">${status}</span>
+                        <span class="tag tag-category">${category}</span>
+                        <span class="tag tag-checkpoints">${checkpoints}</span>
+                    </div>
+                    <h3 class="event-title">${title}</h3>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        function filterBySearch() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (!q) { renderEvents(); return; }
+            const feed = document.getElementById('events-feed');
+            feed.innerHTML = '';
+            allEvents.filter(ev => (ev.title || '').toLowerCase().includes(q)).forEach(ev => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.innerHTML = `<h3 class="event-title">${ev.title}</h3>`;
+                feed.appendChild(card);
+            });
+        }
+
+        // Run immediately — no DOMContentLoaded needed since script is at bottom of body
+        main();
+    
+    // Global Sidebar and Menu logic injected by update script
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>
+

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainAttendeeDashboard"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9FC">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:background="@drawable/bg_outlined_button"
+            android:padding="10dp"
+            app:tint="#0D162A" />
+
+        <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+
+        
+
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_primary_button"
+            android:backgroundTint="#0F172A"
+            android:text="AS"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Upcoming Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="UPCOMING" android:textColor="#3B35A8" android:textStyle="bold" android:textSize="12sp" android:letterSpacing="0.05" />
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_primary_button" android:backgroundTint="#EEF2FF" android:text="📅" android:textSize="20sp" android:gravity="center" android:layout_alignParentEnd="true" />
+                </RelativeLayout>
+                
+                <TextView android:id="@+id/tvUpcomingCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#0F172A" android:textStyle="bold" android:textSize="40sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Registered &amp; ahead" android:textColor="#475569" android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Registered Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:elevation="2dp"
+                android:layout_marginBottom="16dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="REGISTERED" android:textColor="#3B35A8" android:textStyle="bold" android:textSize="12sp" android:letterSpacing="0.05" />
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_primary_button" android:backgroundTint="#EEF2FF" android:text="📆" android:textSize="20sp" android:gravity="center" android:layout_alignParentEnd="true" />
+                </RelativeLayout>
+                
+                <TextView android:id="@+id/tvRegisteredCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#0F172A" android:textStyle="bold" android:textSize="40sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="All time" android:textColor="#475569" android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Attended Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:elevation="2dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ATTENDED" android:textColor="#3B35A8" android:textStyle="bold" android:textSize="12sp" android:letterSpacing="0.05" />
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_primary_button" android:backgroundTint="#CCFBF1" android:text="👥" android:textSize="20sp" android:gravity="center" android:layout_alignParentEnd="true" />
+                </RelativeLayout>
+                
+                <TextView android:id="@+id/tvAttendedCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#0F172A" android:textStyle="bold" android:textSize="40sp" android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Verified presence" android:textColor="#475569" android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Drawer Layout / Sidebar overlay (simplification: we just wire Menu button to close/open or similar if needed, or we just rely on bottom nav) -->
+    <!-- Note: A true DrawerLayout would wrap everything. Since other activities used a custom sidebar, I'll stick to bottom nav for attendee primary nav here. -->
+
+    <!-- Bottom Nav -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout android:id="@+id/navDashboard" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⊞" android:textSize="24sp" android:textColor="#3B35A8" android:textStyle="bold" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textSize="12sp" android:textColor="#3B35A8" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navDiscover" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🧭" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Discover" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navMy" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navAttendance" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🎟️" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Attendance" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:visibility="gone" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="More"/></LinearLayout>
+    </LinearLayout>
+
+
+    <!-- Dim Overlay: tap to close sidebar -->
+    <View
+        android:id="@+id/sidebarDim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Sidebar Panel -->
+    <LinearLayout
+        android:id="@+id/sidebarPanel"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#1A2340"
+        android:visibility="gone"
+        android:translationX="-700dp"
+        android:elevation="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:gravity="center_vertical"
+            android:background="#1E2D55"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:id="@+id/sidebarAvatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_primary_button"
+                android:backgroundTint="#5B54E3"
+                android:text="U"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+                <TextView
+                    android:id="@+id/sidebarName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ZyntraPass"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Attendee workspace"
+                    android:textColor="#94A3B8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Nav Items -->
+        <LinearLayout android:id="@+id/sidebarNavDashboard" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="⊞" android:textColor="#FFFFFF" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textColor="#FFFFFF" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/sidebarNavDiscover" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="🧭" android:textColor="#94A3B8" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Discover" android:textColor="#94A3B8" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/sidebarNavMyEvents" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="📅" android:textColor="#94A3B8" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="My Events" android:textColor="#94A3B8" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/sidebarNavAttendance" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="🎟️" android:textColor="#94A3B8" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Attendance" android:textColor="#94A3B8" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/sidebarNavCerts" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="🏅" android:textColor="#94A3B8" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Certificates" android:textColor="#94A3B8" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/sidebarNavSettings" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="⚙️" android:textColor="#94A3B8" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Settings" android:textColor="#94A3B8" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#2D3F5E" android:layout_marginVertical="8dp" />
+
+        <LinearLayout android:id="@+id/sidebarNavLogout" android:layout_width="match_parent" android:layout_height="56dp" android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
+            <TextView android:layout_width="24dp" android:layout_height="24dp" android:text="🚪" android:textColor="#EF4444" android:textSize="18sp" android:gravity="center" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Logout" android:textColor="#EF4444" android:textSize="15sp" android:layout_marginStart="16dp" android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

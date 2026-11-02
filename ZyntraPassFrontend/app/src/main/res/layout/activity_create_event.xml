@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainCreateEvent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9FC">
+
+    <!-- Top Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="24dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="#0D162A" />
+
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_role_button"
+            android:backgroundTint="#EADDFF"
+            android:text="DM"
+            android:textColor="#5B54E3"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/btnNotifications"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@android:drawable/ic_dialog_info"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@id/tvAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="#0D162A" android:visibility="gone" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Create event"
+                android:textColor="#0D162A"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Seven steps: details, schedule, geofence, speakers, sessions, attendance rules and publish."
+                android:textColor="#4A5568"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Stepper -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                <TextView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/bg_role_button" android:backgroundTint="#5B54E3" android:text="1" android:textColor="#FFFFFF" android:gravity="center" android:textStyle="bold" android:layout_marginEnd="16dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Basic information" android:textColor="#0D162A" android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                <TextView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/bg_role_button" android:backgroundTint="#E2E8F0" android:text="2" android:textColor="#4A5568" android:gravity="center" android:layout_marginEnd="16dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Date &amp; time" android:textColor="#4A5568" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                <TextView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/bg_role_button" android:backgroundTint="#E2E8F0" android:text="3" android:textColor="#4A5568" android:gravity="center" android:layout_marginEnd="16dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Location" android:textColor="#4A5568" />
+            </LinearLayout>
+
+            <!-- Skipping 4-7 for brevity to save space, but visually they'd be there in a real app or RecyclerView -->
+
+            <!-- Form Card -->
+            <LinearLayout
+                android:id="@+id/cardStep1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 1 — Basic information"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Event Name -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Event name" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etEventName"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="e.g. AI Innovation Summit 2026"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Description -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Description" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etEventDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:padding="16dp"
+                    android:gravity="top|start"
+                    android:hint="Describe your event..."
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Category -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Category" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <Spinner
+                    android:id="@+id/spinnerCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Banner Image -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Banner image" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <LinearLayout
+                    android:id="@+id/uploadBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_dashed_border"
+                    android:layout_marginBottom="32dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:id="@+id/ivBannerPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/uploadPlaceholder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🖼️" android:textSize="24sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Upload a 16:9 banner" android:textColor="#5B54E3" android:textStyle="bold" android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Actions -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBack"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinue"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Step 2 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 2 — Date &amp; time"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Start Date -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Start date" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etStartDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="dd-mm-yyyy"
+                    android:drawableEnd="@android:drawable/ic_menu_today"
+                    android:drawableTint="#0D162A"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- End Date -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="End date" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etEndDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="dd-mm-yyyy"
+                    android:drawableEnd="@android:drawable/ic_menu_today"
+                    android:drawableTint="#0D162A"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Start Time -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Start time" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etStartTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="09:00"
+                    android:drawableEnd="@android:drawable/ic_menu_recent_history"
+                    android:drawableTint="#0D162A"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- End Time -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="End time" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etEndTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="12:30"
+                    android:drawableEnd="@android:drawable/ic_menu_recent_history"
+                    android:drawableTint="#0D162A"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="32dp" />
+
+                <!-- Actions -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinueStep2"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 3 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 3 — Location"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Venue" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etVenue"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="Silver Jubilee Auditorium"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Address" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:padding="16dp"
+                    android:gravity="top|start"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="GPS latitude" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etLat"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="13.0108"
+                    android:inputType="numberDecimal"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="GPS longitude" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etLng"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="74.7943"
+                    android:inputType="numberDecimal"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Attendance radius (metres)" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etRadius"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="100"
+                    android:inputType="number"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Attendance is rejected outside this radius." android:textColor="#4A5568" android:textSize="12sp" android:layout_marginBottom="24dp" />
+
+                <!-- Geofence Visualizer -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_role_button"
+                    android:backgroundTint="#F1F5F9"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp">
+                    
+                    <RelativeLayout android:layout_width="80dp" android:layout_height="80dp">
+                        <View android:layout_width="80dp" android:layout_height="80dp" android:background="@drawable/bg_role_button" android:backgroundTint="#335B54E3" />
+                        <View android:layout_width="12dp" android:layout_height="12dp" android:layout_centerInParent="true" android:background="@drawable/bg_role_button" android:backgroundTint="#5B54E3" />
+                    </RelativeLayout>
+                    
+                    <TextView
+                        android:id="@+id/tvGeofence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100 m geofence · 13.0108, 74.7943"
+                        android:textColor="#0D162A"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:layout_marginTop="12dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinueStep3"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 4 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 4 — Speakers"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Container for Guest Items -->
+                <LinearLayout
+                    android:id="@+id/llGuestsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Add Guest Button -->
+                <LinearLayout
+                    android:id="@+id/btnAddGuest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="14dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp">
+                    
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+" android:textSize="18sp" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginEnd="8dp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add guest" android:textColor="#0D162A" android:textStyle="bold" android:textSize="15sp" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E2E8F0" android:layout_marginBottom="32dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinueStep4"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 5 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 5 — Sessions"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Container for Session Items -->
+                <LinearLayout
+                    android:id="@+id/llSessionsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Add Session Button -->
+                <LinearLayout
+                    android:id="@+id/btnAddSession"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="14dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp">
+                    
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+" android:textSize="18sp" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginEnd="8dp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add session" android:textColor="#0D162A" android:textStyle="bold" android:textSize="15sp" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E2E8F0" android:layout_marginBottom="32dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinueStep5"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 6 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 6 — Attendance rules"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Checkpoints count -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Number of checkpoints" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etCheckpointsCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="4"
+                    android:text="4"
+                    android:inputType="number"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="8dp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="A 2–3 hour event usually needs 3–4." android:textColor="#4A5568" android:textSize="12sp" android:layout_marginBottom="24dp" />
+
+                <!-- Checkpoint timing -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Checkpoint timing" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <Spinner
+                    android:id="@+id/spinnerCheckpointTiming"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Minimum attendance -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Minimum attendance for certificate (%)" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etMinAttendance"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="80"
+                    android:text="80"
+                    android:inputType="number"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- QR Refresh -->
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="QR refresh interval (seconds)" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/etQrRefresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_outlined_button"
+                    android:paddingHorizontal="16dp"
+                    android:hint="10"
+                    android:text="10"
+                    android:inputType="number"
+                    android:textColor="#0D162A"
+                    android:textColorHint="#94A3B8"
+                    android:layout_marginBottom="24dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_role_button"
+                    android:backgroundTint="#F8FAFF"
+                    android:padding="24dp"
+                    android:layout_marginBottom="32dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Defaults: QR refreshes every 10 seconds, certificates require 80% verified attendance." android:textColor="#3B35A8" android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep6"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnContinueStep6"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Continue →"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 7 Card -->
+            <LinearLayout
+                android:id="@+id/cardStep7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_button"
+                android:padding="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 7 — Publish"
+                    android:textColor="#0D162A"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Preview Box -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_outlined_button"
+                    android:padding="24dp"
+                    android:layout_marginBottom="32dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PREVIEW" android:textColor="#475569" android:textSize="12sp" android:textStyle="bold" android:layout_marginBottom="12dp" />
+                    
+                    <TextView android:id="@+id/tvPreviewTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Untitled event" android:textColor="#0F172A" android:textSize="24sp" android:textStyle="bold" android:layout_marginBottom="8dp" />
+                    <TextView android:id="@+id/tvPreviewCategory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Summit" android:textColor="#3B35A8" android:textSize="15sp" android:layout_marginBottom="16dp" />
+                    <TextView android:id="@+id/tvPreviewDesc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="No description added yet." android:textColor="#334155" android:textSize="15sp" android:layout_marginBottom="32dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Schedule" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewSchedule" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="24dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Venue" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewVenue" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="24dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Geofence" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewGeofence" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="24dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Guests" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewGuests" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="0 added" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="24dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Sessions" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewSessions" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="0 added" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="24dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Attendance rule" android:textColor="#64748B" android:textSize="13sp" android:layout_marginBottom="4dp" />
+                    <TextView android:id="@+id/tvPreviewRules" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold" android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/btnBackStep7"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="← Back"
+                        android:textColor="#94A3B8"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnPublishEvent"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:text="Create Event"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_primary_button"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Nav Placeholder -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:paddingTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout android:id="@+id/navDashboard" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⊞" android:textColor="#5B54E3" android:textSize="20sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textColor="#5B54E3" android:textSize="11sp" android:textStyle="bold" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navEvents" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textColor="#4A5568" android:textSize="20sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" android:textColor="#4A5568" android:textSize="11sp" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navParticipants" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👥" android:textColor="#4A5568" android:textSize="20sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Participants" android:textColor="#4A5568" android:textSize="11sp" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/navLive" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📡" android:textColor="#4A5568" android:textSize="20sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Live" android:textColor="#4A5568" android:textSize="11sp" android:layout_marginTop="2dp" />
+        </LinearLayout>
+        <LinearLayout android:visibility="gone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_horizontal">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="More"/></LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyntraPass – Settings</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f7f9fc; color: #0d162a; padding-bottom: 80px; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: white; padding: 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+        }
+        .btn-menu {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            width: 44px; height: 44px; font-size: 20px; cursor: pointer; color: #0d162a;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn-bell { background: none; border: none; font-size: 24px; position: relative; cursor: pointer; }
+        .badge-notif {
+            position: absolute; top: -2px; right: -4px; background: #ef4444;
+            color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .avatar {
+            width: 40px; height: 40px; background: #e0e7ff; color: #5b54e3;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+
+        /* ── Container ── */
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+
+        /* ── Page heading ── */
+        .page-title { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .page-subtitle { font-size: 14px; color: #475569; line-height: 1.5; margin-bottom: 24px; }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; margin-top: 8px;
+            overflow-x: auto; scrollbar-width: none; gap: 24px; padding-bottom: 2px;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-item {
+            font-size: 15px; font-weight: 700; color: #475569;
+            cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; padding-bottom: 12px; margin-bottom: -2px;
+        }
+        .tab-item.active { color: #3b35a8; border-bottom-color: #3b35a8; }
+
+        /* ── Settings Cards ── */
+        .settings-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 20px; margin-bottom: 16px;
+        }
+        .card-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .card-desc { font-size: 14px; color: #475569; margin-bottom: 20px; line-height: 1.4; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; color: #0f172a; transition: border-color 0.2s; }
+        .form-input:focus { outline: none; border-color: #5b54e3; }
+        
+        .btn-primary {
+            background: #5b54e3; color: white; border: none; padding: 14px 24px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:disabled { opacity: 0.5; cursor: default; }
+        
+        .btn-danger {
+            background: #dc2626; color: white; border: none; padding: 14px 24px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;
+        }
+        .btn-danger:hover { opacity: 0.9; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .success-msg { color: #16a34a; font-size: 14px; margin-top: 12px; font-weight: 600; display: none; }
+        .error-msg { color: #dc2626; font-size: 14px; margin-top: 12px; font-weight: 600; display: none; }
+
+        /* ── Bottom Nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white;
+            border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around;
+            padding: 12px 0; z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; color: #64748b;
+            font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; gap: 4px;
+        }
+        .nav-item.active { color: #5b54e3; }
+        .nav-icon { font-size: 20px; }
+
+        /* ── Sidebar ── */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .sidebar-overlay.active { display: block; }
+        .sidebar { position: fixed; top: 0; left: -300px; bottom: 0; width: 300px; background: linear-gradient(180deg, #1A448C 0%, #0D162A 100%); z-index: 1000; transition: left 0.3s ease; display: flex; flex-direction: column; color: white; box-shadow: 4px 0 16px rgba(0,0,0,0.2); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo-icon { width: 40px; height: 40px; background-color: #5B54E3; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .sidebar-brand { font-size: 18px; font-weight: bold; margin: 0; }
+        .sidebar-subbrand { font-size: 12px; color: #A8B2D1; margin: 0; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-item { padding: 12px 24px; display: flex; align-items: center; gap: 16px; color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .sidebar-footer { padding: 24px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-footer .avatar { width: 40px; height: 40px; background-color: #3C4260; color: #A8B2D1; font-size: 14px; }
+        .sidebar-user-info { flex: 1; }
+        .sidebar-user-name { margin: 0; font-weight: bold; font-size: 14px; color: white; }
+        .sidebar-user-email { margin: 0; font-size: 11px; color: #A8B2D1; }
+        .sidebar-logout { font-size: 20px; color: #A8B2D1; cursor: pointer; }
+        .sidebar-logout:hover { color: white; }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo-icon">✨</div>
+        <div>
+            <p class="sidebar-brand">ZyntraPass</p>
+            <p class="sidebar-subbrand">Organizer workspace</p>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+            <a href="attendee_dashboard.html" class="sidebar-item"><span>🏠</span> Dashboard</a>
+            <a href="attendee_discover.html" class="sidebar-item"><span>🔍</span> Discover</a>
+            <a href="attendee_my_events.html" class="sidebar-item"><span>📅</span> My Events</a>
+            <a href="attendee_attendance.html" class="sidebar-item"><span>📡</span> Attendance</a>
+            <a href="attendee_certificates.html" class="sidebar-item"><span>📜</span> Certificates</a>
+            <a href="attendee_settings.html" class="sidebar-item active"><span>⚙️</span> Settings</a>
+        </div>
+    <div class="sidebar-footer">
+        <div class="avatar" id="sidebar-avatar">--</div>
+        <div class="sidebar-user-info">
+            <p class="sidebar-user-name" id="sidebar-name">Loading...</p>
+            <p class="sidebar-user-email" id="sidebar-email">...</p>
+        </div>
+        <div class="sidebar-logout" id="sidebar-logout">🚪</div>
+    </div>
+</div>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+    <button class="btn-menu" id="menuBtn">☰</button>
+    </div>
+
+<!-- ── Main Content ── -->
+<div class="container" id="main-container">
+    <h1 class="page-title">Settings</h1>
+    <p class="page-subtitle">Manage your attendee account, security and privacy.</p>
+
+    <div class="tabs">
+        <div class="tab-item active" onclick="switchTab('account')">Profile</div>
+        <div class="tab-item" onclick="switchTab('security')">Change password</div>
+        <div class="tab-item" onclick="switchTab('privacy')">Privacy and Policy</div>
+        <div class="tab-item" style="color:#dc2626;" onclick="logoutHandler()">Logout</div>
+    </div>
+
+    <!-- Account Tab -->
+    <div class="tab-content active" id="tab-account">
+        <div class="settings-card">
+            <h2 class="card-title">Profile details</h2>
+            <p class="card-desc">This is your global ZyntraPass identity across all organisations</p>
+
+            <form id="profile-form">
+                <div class="form-group">
+                    <label class="form-label">Full name</label>
+                    <input type="text" class="form-input" id="inp-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="inp-email" readonly disabled style="background:#f8fafc; cursor:not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-input" id="inp-phone">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Institution / Organisation</label>
+                    <input type="text" class="form-input" id="inp-inst">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Area / City</label>
+                    <input type="text" class="form-input" id="inp-city">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Native place</label>
+                    <input type="text" class="form-input" id="inp-native">
+                </div>
+                <button type="submit" class="btn-primary" id="btn-save-profile">Save changes</button>
+                <div class="success-msg" id="msg-profile-success">Changes saved successfully.</div>
+                <div class="error-msg" id="msg-profile-error">Error saving changes.</div>
+            </form>
+        </div>
+
+        <div class="settings-card">
+            <h2 class="card-title">Log out of ZyntraPass</h2>
+            <p class="card-desc">You'll need to sign in again to access your events.</p>
+            <button class="btn-danger" id="btn-logout-main">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div class="tab-content" id="tab-security">
+        <div class="settings-card">
+            <h2 class="card-title">Change password</h2>
+            
+            <form id="password-form">
+                <div class="form-group">
+                    <label class="form-label">Current password</label>
+                    <input type="password" class="form-input" id="inp-current-pass" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New password</label>
+                    <input type="password" class="form-input" id="inp-new-pass" required minlength="6">
+                </div>
+                <div style="text-align: right; margin-bottom: 16px;">
+                    <a href="javascript:alert('Forgot Password flow will be sent to your email!')" style="color: #5b54e3; font-size: 13px; text-decoration: none; font-weight: 600;">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn-primary" id="btn-save-password">Update password</button>
+                <div class="success-msg" id="msg-pwd-success">Password updated successfully.</div>
+                <div class="error-msg" id="msg-pwd-error">Error updating password.</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Other Tabs (Empty State) -->
+    
+    
+    <div class="tab-content" id="tab-privacy">
+        <div class="settings-card">
+            <h2 class="card-title">Privacy and Policy</h2>
+            <p class="card-desc" style="margin-bottom: 12px;">Here are our core privacy principles:</p>
+            <ul style="margin-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                <li><strong>1. Data Minimization:</strong> We only collect the personal data absolutely necessary to provide our event management services.</li>
+                <li><strong>2. Secure Storage:</strong> Your information is encrypted in transit and at rest using industry-standard security measures.</li>
+                <li><strong>3. No Third-Party Selling:</strong> We never sell your personal information or attendee data to third-party marketers or advertisers.</li>
+                <li><strong>4. User Control:</strong> You have the right to access, modify, or permanently delete your account data at any time.</li>
+                <li><strong>5. Transparent Tracking:</strong> We only use essential cookies and tracking for functionality, not for invasive cross-site profiling.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+    <a href="attendee_dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a href="attendee_discover.html" class="nav-item">
+        <span class="nav-icon">🔍</span><span>Discover</span>
+    </a>
+    <a href="attendee_my_events.html" class="nav-item">
+        <span class="nav-icon">📅</span><span>Events</span>
+    </a>
+    <a href="attendee_attendance.html" class="nav-item">
+        <span class="nav-icon">📡</span><span>Attendance</span>
+    </a>
+    <a href="attendee_certificates.html" class="nav-item">
+        <span class="nav-icon">📜</span><span>Certs</span>
+    </a>
+</div>
+
+<script>
+    const SUPABASE_URL  = 'https://qokgtrabcxtxlympbkyb.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFva2d0cmFiY3h0eGx5bXBia3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczODMyMDYsImV4cCI6MjEwMjk1OTIwNn0.hbs5MZ4FiqUoZxDTrGqtMPOjRbbKUupgZOcoeLZa3ME';
+
+    let sb, currentUserId, currentUserEmail;
+
+    async function main() {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+
+        currentUserId = session.user.id;
+        currentUserEmail = session.user.email;
+
+        // Populate Sidebar
+        document.getElementById('sidebar-email').textContent = currentUserEmail;
+        
+        // Sidebar wiring
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        document.getElementById('menuBtn').addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+        
+        window.logoutHandler = async () => { await sb.auth.signOut(); window.location.href = 'index.html'; };
+        document.getElementById('sidebar-logout').addEventListener('click', logoutHandler);
+        document.getElementById('btn-logout-main').addEventListener('click', logoutHandler);
+
+        await loadProfile();
+        setupForms();
+    }
+
+    async function loadProfile() {
+        const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUserId).maybeSingle();
+        if (profile) {
+            // Setup Avatars
+            if (profile.full_name) {
+                const initials = profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                (document.getElementById('userAvatar') || {}).textContent = initials;
+                document.getElementById('sidebar-avatar').textContent = initials;
+                document.getElementById('sidebar-name').textContent   = profile.full_name;
+            }
+            
+            // Populate Form
+            document.getElementById('inp-name').value = profile.full_name || '';
+            document.getElementById('inp-email').value = currentUserEmail;
+            document.getElementById('inp-phone').value = profile.phone || '';
+            document.getElementById('inp-inst').value = profile.institution || '';
+            document.getElementById('inp-city').value = profile.area_city || '';
+            document.getElementById('inp-native').value = profile.native_place || '';
+        }
+    }
+
+    function setupForms() {
+        // Profile Form
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-profile');
+            const sMsg = document.getElementById('msg-profile-success');
+            const eMsg = document.getElementById('msg-profile-error');
+            
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            sMsg.style.display = 'none';
+            eMsg.style.display = 'none';
+
+            const updates = {
+                full_name: document.getElementById('inp-name').value,
+                phone: document.getElementById('inp-phone').value,
+                institution: document.getElementById('inp-inst').value,
+                area_city: document.getElementById('inp-city').value,
+                native_place: document.getElementById('inp-native').value
+            };
+
+            const { error } = await sb.from('profiles').update(updates).eq('id', currentUserId);
+            
+            if (error) {
+                eMsg.textContent = error.message;
+                eMsg.style.display = 'block';
+            } else {
+                sMsg.style.display = 'block';
+                // Update avatar if name changed
+                const initials = updates.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                (document.getElementById('userAvatar') || {}).textContent = initials;
+                document.getElementById('sidebar-avatar').textContent = initials;
+                document.getElementById('sidebar-name').textContent = updates.full_name;
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Save changes';
+        });
+
+        // Password Form
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-password');
+            const sMsg = document.getElementById('msg-pwd-success');
+            const eMsg = document.getElementById('msg-pwd-error');
+            
+            const newPass = document.getElementById('inp-new-pass').value;
+            const confPass = document.getElementById('inp-confirm-pass').value;
+            
+            sMsg.style.display = 'none';
+            eMsg.style.display = 'none';
+
+            if (newPass !== confPass) {
+                eMsg.textContent = "Passwords do not match.";
+                eMsg.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            const { error } = await sb.auth.updateUser({ password: newPass });
+            
+            if (error) {
+                eMsg.textContent = error.message;
+                eMsg.style.display = 'block';
+            } else {
+                sMsg.style.display = 'block';
+                document.getElementById('inp-new-pass').value = '';
+                document.getElementById('inp-confirm-pass').value = '';
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Update password';
+        });
+    }
+
+    window.switchTab = function(tabId) {
+        // Update active tab styles
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-item[onclick*="${tabId}"]`).classList.add('active');
+        
+        // Update tab contents
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+    };
+
+    main();
+
+    // Global Sidebar and Menu logic injected by update script
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>
+
+
+

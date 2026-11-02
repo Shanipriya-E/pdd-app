@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f7f9fc">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/btnMenu"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:background="@drawable/bg_outlined_button"/>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/topBar"
+            app:layout_constraintBottom_toTopOf="@id/bottomNav">
+            
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp">
+                
+                <!-- LIST VIEW -->
+                <LinearLayout
+                    android:id="@+id/layoutList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Live Events"
+                        android:textColor="#0f172a"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"/>
+                        
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Select an ongoing event to track attendance."
+                        android:textColor="#475569"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="24dp"/>
+                        
+                    <LinearLayout
+                        android:id="@+id/eventsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+                </LinearLayout>
+    
+                <!-- DETAIL VIEW -->
+                <LinearLayout
+                    android:id="@+id/layoutDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                    
+                    <TextView
+                        android:id="@+id/btnBack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="← Back to Events"
+                        android:textColor="#5b54e3"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="16dp"
+                        android:paddingVertical="8dp"/>
+                        
+                    <TextView
+                        android:id="@+id/tvDetailTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Event Title"
+                        android:textColor="#0f172a"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp"/>
+                        
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Live GPS Attendance Tracking • Auto-updates every 10s"
+                        android:textColor="#475569"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="24dp"/>
+                        
+                    <LinearLayout
+                        android:id="@+id/participantsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+                </LinearLayout>
+            </FrameLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:background="@android:color/white"
+            android:elevation="8dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Dashboard -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📊" android:textColor="#5b54e3" android:textSize="20sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textSize="11sp" android:textColor="#5b54e3" android:textStyle="bold" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Events -->
+            <LinearLayout android:id="@+id/navEvents" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textColor="#4a5568" android:textSize="20sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" android:textSize="11sp" android:textColor="#4a5568" android:textStyle="bold" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Participants -->
+            <LinearLayout android:id="@+id/navParticipants" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👥" android:textColor="#4a5568" android:textSize="20sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Participants" android:textSize="11sp" android:textColor="#4a5568" android:textStyle="bold" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Live -->
+            <LinearLayout android:id="@+id/navLive" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📡" android:textColor="#4a5568" android:textSize="20sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Live" android:textSize="11sp" android:textColor="#4a5568" android:textStyle="bold" android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#0d162a"
+        android:orientation="vertical">
+        
+        <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingTop="32dp">
+                <TextView android:id="@+id/navSidebarDashboard" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="📊 Dashboard" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" android:background="#16233b" />
+                <TextView android:id="@+id/navSidebarEvents" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="📅 Events" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/navSidebarParticipants" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="👥 Participants" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/navSidebarLive" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="📡 Live Attendance" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+                
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#16233b" android:layout_marginVertical="8dp"/>
+                
+                <TextView android:id="@+id/navSidebarVolunteers" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🤝 Volunteers" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/navSidebarCertificates" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="📜 Certificates" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+                <TextView android:id="@+id/navSidebarSettings" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="⚙️ Settings" android:textColor="#E2E8F0" android:padding="16dp" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+        </ScrollView>
+        
+        <!-- Profile at the bottom of sidebar -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="24dp" android:gravity="center_vertical" android:background="#16233b">
+            <TextView android:id="@+id/tvSidebarAvatar" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:backgroundTint="#5B54E3" android:textColor="#FFFFFF" android:textSize="16sp" android:gravity="center" android:textStyle="bold" android:layout_marginEnd="16dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/tvSidebarName" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/tvSidebarEmail" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#A8B2D1" android:textSize="12sp" />
+            </LinearLayout>
+            <TextView android:id="@+id/btnSidebarLogout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Logout" android:textColor="#A8B2D1" android:textSize="14sp" android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
+

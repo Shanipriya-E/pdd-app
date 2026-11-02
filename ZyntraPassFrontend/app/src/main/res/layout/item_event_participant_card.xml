@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#FFFFFF"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="14dp">
+
+    <!-- Left: Status color bar -->
+    <View
+        android:id="@+id/vStatusBar"
+        android:layout_width="4dp"
+        android:layout_height="60dp"
+        android:background="#5B54E3"
+        android:layout_marginEnd="14dp" />
+
+    <!-- Center: Title + chips -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvEventTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event Title"
+            android:textColor="#0F172A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Status + total chips row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvStatusChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="upcoming"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_role_button"
+                android:backgroundTint="#EEF2FF"
+                android:textColor="#3B35A8"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvTotalRequests"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 requests"
+                android:textSize="12sp"
+                android:textColor="#64748B" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Right: Pending badge -->
+    <TextView
+        android:id="@+id/tvPendingBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3 pending"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#D97706"
+        android:background="@drawable/bg_role_button"
+        android:backgroundTint="#FFF4E5"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:layout_marginStart="8dp" />
+
+</LinearLayout>

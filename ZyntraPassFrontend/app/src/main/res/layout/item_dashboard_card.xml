@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="24dp"
+    android:elevation="2dp"
+    android:layout_marginBottom="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:id="@+id/tvStatTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#3B35A8"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:letterSpacing="0.05" />
+        <TextView
+            android:id="@+id/tvStatIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:backgroundTint="#EEF2FF"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+    
+    <TextView
+        android:id="@+id/tvStatValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#0F172A"
+        android:textStyle="bold"
+        android:textSize="40sp"
+        android:layout_marginBottom="8dp" />
+    <TextView
+        android:id="@+id/tvStatSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#475569"
+        android:textSize="14sp" />
+</LinearLayout>

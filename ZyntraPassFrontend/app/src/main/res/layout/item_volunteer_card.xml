@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_white_button"
+    android:padding="20dp"
+    android:layout_marginBottom="16dp"
+    android:elevation="1dp">
+
+    <!-- Top row: avatar + name/sub + status chip -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvVolAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_primary_button"
+            android:backgroundTint="#CCFBF1"
+            android:text="KS"
+            android:textColor="#0F766E"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+                
+                <TextView
+                    android:id="@+id/tvVolName"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="#0F172A"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+                    
+                <TextView
+                    android:id="@+id/tvVolStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="pending"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_role_button"
+                    android:backgroundTint="#FFFBEB"
+                    android:textColor="#D97706"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvVolInstitution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Institution"
+                android:textColor="#475569"
+                android:textSize="13sp"
+                android:layout_marginBottom="8dp" />
+                
+            <TextView
+                android:id="@+id/tvVolEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="email@example.com"
+                android:textColor="#334155"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+                
+            <TextView
+                android:id="@+id/tvVolPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+91 00000 00000"
+                android:textColor="#334155"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_role_button"
+        android:backgroundTint="#F8FAFC"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REQUESTED EVENT"
+            android:textColor="#64748B"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp" />
+        <TextView
+            android:id="@+id/tvVolEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Name"
+            android:textColor="#0F172A"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_role_button"
+        android:backgroundTint="#F8FAFC"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REQUEST DATE"
+            android:textColor="#64748B"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp" />
+        <TextView
+            android:id="@+id/tvVolDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="14 Aug 2026"
+            android:textColor="#0F172A"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvVolMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Message here..."
+        android:textColor="#334155"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="20dp" />
+
+    <LinearLayout
+        android:id="@+id/llVolActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnAcceptVol"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Accept"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="#10B981"
+            android:layout_marginEnd="10dp" />
+
+        <Button
+            android:id="@+id/btnRejectVol"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Reject"
+            android:textAllCaps="false"
+            android:textColor="#0F172A"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="#FFFFFF" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvVolStatusMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status message"
+        android:textColor="#5B54E3"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+</LinearLayout>

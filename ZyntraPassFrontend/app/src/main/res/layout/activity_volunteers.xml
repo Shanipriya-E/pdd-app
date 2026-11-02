@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainVolunteers"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F9FC">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:background="@drawable/bg_outlined_button"
+            android:padding="10dp"
+            app:tint="#0D162A" />
+
+        <Space android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
+
+        
+
+        <TextView
+            android:id="@+id/tvUserAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_primary_button"
+            android:backgroundTint="#E0E7FF"
+            android:text="U"
+            android:textColor="#5B54E3"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volunteers"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#0F172A"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volunteer scanning access activates only after you accept a request."
+                android:textColor="#475569"
+                android:textSize="15sp"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Stat Cards -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+
+                <!-- Pending -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_white_button"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="2dp">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PENDING REQUESTS"
+                        android:textColor="#334155"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+                    
+                    <TextView
+                        android:id="@+id/tvStatPending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#0F172A"
+                        android:layout_marginTop="20dp" />
+                        
+                    <TextView
+                        android:id="@+id/iconPending"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_role_button"
+                        android:backgroundTint="#FFF4E5"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true" />
+                </RelativeLayout>
+
+                <!-- Approved -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_white_button"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="2dp">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APPROVED"
+                        android:textColor="#334155"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+                    
+                    <TextView
+                        android:id="@+id/tvStatApproved"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#0F172A"
+                        android:layout_marginTop="20dp" />
+                        
+                    <TextView
+                        android:id="@+id/iconApproved"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:text=""
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_role_button"
+                        android:backgroundTint="#DCFCE7"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true" />
+                </RelativeLayout>
+
+                <!-- Rejected -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_white_button"
+                    android:padding="20dp"
+                    android:elevation="2dp">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="REJECTED"
+                        android:textColor="#334155"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+                    
+                    <TextView
+                        android:id="@+id/tvStatRejected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#0F172A"
+                        android:layout_marginTop="20dp" />
+                        
+                    <TextView
+                        android:id="@+id/iconRejected"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:text=""
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_role_button"
+                        android:backgroundTint="#FEE2E2"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Tabs -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginBottom="16dp">
+                
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    
+                    <!-- Requests Tab -->
+                    <LinearLayout android:id="@+id/tabRequests" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="8dp" android:layout_marginEnd="24dp" android:background="@drawable/bg_tab_indicator">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Requests" android:textColor="#3B35A8" android:textStyle="bold" android:textSize="15sp" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/badgeRequests" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#3B35A8" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_role_button" android:backgroundTint="#EEF2FF" android:paddingHorizontal="8dp" android:paddingVertical="2dp" />
+                    </LinearLayout>
+                    
+                    <!-- Approved Tab -->
+                    <LinearLayout android:id="@+id/tabApproved" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="8dp" android:layout_marginEnd="24dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Approved" android:textColor="#475569" android:textStyle="bold" android:textSize="15sp" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/badgeApproved" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#334155" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_role_button" android:backgroundTint="#F1F5F9" android:paddingHorizontal="8dp" android:paddingVertical="2dp" />
+                    </LinearLayout>
+
+                    <!-- Rejected Tab -->
+                    <LinearLayout android:id="@+id/tabRejected" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="8dp" android:layout_marginEnd="24dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rejected" android:textColor="#475569" android:textStyle="bold" android:textSize="15sp" android:layout_marginEnd="8dp" />
+                        <TextView android:id="@+id/badgeRejected" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#334155" android:textSize="12sp" android:textStyle="bold" android:background="@drawable/bg_role_button" android:backgroundTint="#F1F5F9" android:paddingHorizontal="8dp" android:paddingVertical="2dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+            
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E2E8F0" android:layout_marginTop="-17dp" android:layout_marginBottom="24dp"/>
+
+            <!-- List -->
+            <LinearLayout
+                android:id="@+id/llVolunteerFeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvLoading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Loading volunteers..."
+                    android:gravity="center"
+                    android:textColor="#64748B"
+                    android:layout_marginTop="40dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Nav -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout android:id="@+id/navDashboard" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚏" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dashboard" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navEvents" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Events" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navParticipants" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👥" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Participants" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navLive" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📡" android:textSize="20sp" android:textColor="#64748B" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Live" android:textSize="12sp" android:textColor="#64748B" android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout android:visibility="gone" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="More"/></LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

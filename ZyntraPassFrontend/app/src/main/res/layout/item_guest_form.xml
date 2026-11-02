@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_outlined_button"
+    android:padding="24dp"
+    android:layout_marginBottom="24dp">
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Guest name" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etGuestName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Designation" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etGuestDesignation"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_outlined_button"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Description" android:textColor="#0D162A" android:textStyle="bold" android:layout_marginBottom="8dp" />
+    <EditText
+        android:id="@+id/etGuestDescription"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_outlined_button"
+        android:padding="16dp"
+        android:gravity="top|start"
+        android:textColor="#0D162A"
+        android:textColorHint="#94A3B8"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/btnUploadPhoto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Upload photo"
+            android:textColor="#0D162A"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:background="@drawable/bg_outlined_button"
+            android:gravity="center"
+            android:layout_marginEnd="16dp" />
+
+        <LinearLayout
+            android:id="@+id/btnRemoveGuest"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🗑" android:textSize="16sp" android:layout_marginEnd="8dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Remove" android:textColor="#1E293B" android:textStyle="bold" android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
