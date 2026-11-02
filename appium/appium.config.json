@@ -1,0 +1,23 @@
+{
+  "appium": {
+    "server": {
+      "host": "127.0.0.1",
+      "port": 4723,
+      "basePath": "/wd/hub"
+    },
+    "capabilities": {
+      "platformName": "Android",
+      "appium:automationName": "UIAutomator2",
+      "appium:deviceName": "Android Emulator",
+      "appium:platformVersion": "13.0",
+      "appium:app": "${APP_PATH}",
+      "appium:appPackage": "com.example.zyntrapass",
+      "appium:appActivity": "com.example.zyntrapass.MainActivity",
+      "appium:noReset": false,
+      "appium:fullReset": false,
+      "appium:newCommandTimeout": 120,
+      "appium:autoGrantPermissions": true,
+      "appium:skipUnlock": true
+    }
+  }
+}
